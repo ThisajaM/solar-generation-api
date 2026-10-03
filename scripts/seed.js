@@ -209,16 +209,12 @@ async function main() {
   console.log(`Users: ${users.length}`);
   console.log(`Interval: 15 minutes`);
   console.log(`Window: ${start.toISOString()} → ${end.toISOString()}`);
-  console.log('\nDemo login: admin@example.test / Admin@12345');
-  console.log('Province analyst: analyst.western@example.test / Analyst@12345');
-  console.log('District analyst example: analyst.cmb@example.test / District@12345');
-  console.log('Device example: device00001@devices.example.test / Device@12345');
   console.log(`Example installation id: ${insertedInstallations[0]._id}`);
 }
 
 if (require.main === module) main()
-  .catch((err) => {
-    console.error('Seed failed:', err.name, err.code || '', err.name === 'Error' ? err.message : 'Check database access and data constraints');
+  .catch(() => {
+    console.error('Seed failed; database and credential details suppressed. Check configuration and data constraints.');
     process.exitCode = 1;
   })
   .finally(async () => {

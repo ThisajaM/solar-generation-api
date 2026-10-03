@@ -206,7 +206,7 @@ Version prefix: `/api/v1`.
 | POST | `/api/v1/installations/:installationId/readings` | owning device |
 | GET | `/api/v1/installations/:installationId/readings/:readingId` | analyst or owning device |
 
-Readings are strictly append-only through the API. PUT, PATCH and DELETE are not implemented. GET is safe/idempotent; POST creates immutable history and returns 201 + Location. Duplicate installation/timestamp returns 409. No artificial CRUD endpoints are added: the explicit historical-integrity rule takes priority. GET supports If-Match with 412 on failure. CORS preflight returns 204.
+Readings are strictly append-only through the API. PUT, PATCH and DELETE are not implemented. GET is safe/idempotent; POST creates immutable history and returns 201 + Location. Duplicate installation/timestamp returns 409. The official brief also asks for CRUD semantics and the rubric explicitly asks for full CRUD. This is unresolved assessment scope, not a confirmed exemption; see `report/OFFICIAL-ASSESSMENT-AUDIT.md`. GET supports If-Match with 412 on failure. CORS preflight returns 204.
 
 ## Pagination
 
@@ -299,7 +299,7 @@ CLI alternative: `npx vercel login`, `npx vercel link`, configure the same envir
 
 The configuration follows [Vercel Node functions](https://vercel.com/docs/functions/runtimes/node-js) and [function file inclusion](https://vercel.com/docs/project-configuration/vercel-json). No persistent filesystem, background process or production `app.listen()` is required. MongoDB connections and in-flight connection promises are reused within each warm process.
 
-**Vercel deployment could not be executed from this environment.** No Vercel authentication/project or Atlas URI was provided. Local integration is verified; Atlas network access, Vercel bundle execution and live Swagger need deployment verification.
+**Production deployment verified (2026-10-03).** [Live Swagger](https://project-n8zne.vercel.app/docs/) · [Health](https://project-n8zne.vercel.app/health). Atlas connectivity, Swagger assets, all four demo-role logins, jurisdiction enforcement, 134,400 readings, pagination, filters, conditional requests, summaries and CORS passed live checks. See `report/LIVE-DEPLOYMENT-VERIFICATION.json`. The production domain retains the initial generated project name. Preview configuration and deployment verified on 2026-10-04 (Asia/Colombo). Browser smoke checks passed: Swagger renders, health returns 200 with MongoDB connected, and unauthenticated resource access returns 401. Vercel protection redirects public automated requests to sign-in, so the extended Preview suite remains unverified. Evidence: report/PREVIEW-DEPLOYMENT-VERIFICATION.json.
 
 ## Example API Requests
 
@@ -359,8 +359,38 @@ Other districts follow `analyst.<code>@example.test` with `District@12345`. Devi
 
 ## Submission and viva
 
-Complete `report/AI-DISCLOSURE-TEMPLATE.md` in your own words. Keep genuine development/test evidence; this folder was not a Git repository at audit time and no history was fabricated. Before submission, deploy to Atlas/Vercel, record the actual URLs and rerun the authenticated smoke tests on the live host.
+Complete `report/AI-DISCLOSURE-TEMPLATE.md` in your own words. Keep genuine development/test evidence; this folder was not a Git repository at audit time and no history was fabricated. The Atlas/Vercel deployment is now verified. Before submission, personally rerun the live demonstrations and record your own evidence.
 
 Be prepared to demonstrate login; national vs district visibility; a device POST with 201/Location; forbidden foreign ingestion; paginated/time-filtered history; ETag/304 and If-Match/412; summary arithmetic; Swagger authorization; and MongoDB export/import. Explain why readings are immutable and separate from installations, how queries enforce jurisdiction, what indexes do, and how the serverless connection cache works.
 
 See `COURSEWORK-AUDIT.md` and `report/FINAL-REPORT.md` for the requirement mapping, verified evidence and remaining deployment blockers.
+
+
+## Repeatable verification and deployment gate
+
+The official assessment comparison is in `report/OFFICIAL-ASSESSMENT-AUDIT.md`. Full CRUD is unresolved: readings remain append-only and the assessment does not identify a compatible mutable resource/actor. Do not claim update/delete coverage until that scope is clarified.
+
+With private local configuration in place, run:
+
+```sh
+SEED_CONFIRM=yes npm run seed
+npm run seed:verify
+npm test
+npm run lint
+npm run docs:validate
+npm run smoke -- --local report/LOCAL-ATLAS-VERIFICATION.json
+```
+
+Seeding clears only the six coursework collections in the configured database. Use only the dedicated disposable coursework database. The verifier checks every collection count and 672 readings per installation. The seed no longer prints demo passwords. Do not paste raw credentials, CLI debug output, environment exports or database dumps into evidence.
+
+The smoke runner starts a temporary localhost API with `--local`, or accepts the authorized coursework HTTPS deployment URL. It reads fictional seed credentials in memory, keeps tokens in memory, emits only check results, and preserves the dataset. It covers all four roles, hierarchy routes, own-device reads, forbidden writes, duplicate rejection, validation, conditional requests, summaries and exact reading count. Successful creation is exercised by the isolated automated suite; this smoke runner intentionally uses only rejected write attempts against Atlas.
+
+Authenticate the Vercel CLI in this shell with `npx vercel login`, then link the existing `slsea-solar-generation-api` project in the `thisajams-projects` team. Verify required variable names and target scopes without printing values. Deploy Preview first, test its protected API through authenticated tooling, and deploy production only after Preview passes. Do not turn off Vercel protection to make tests pass. `.vercel` and environment files are ignored and must stay untracked.
+
+Public production recheck command:
+
+```sh
+npm run smoke -- https://project-n8zne.vercel.app report/PRODUCTION-RECHECK.json
+```
+
+The 2026-10-04 follow-up reverified the existing production deployment; it did not publish a new release. The CLI session available to this checkout reported unauthenticated, so a new Preview/production release is pending sign-in. See `report/COMPLETION-STATUS.md` for the final verification scope and remaining submission requirements.

@@ -1,0 +1,38 @@
+{
+  "verifiedAt": "2026-10-03T21:21:35.122399+00:00",
+  "environment": "Preview",
+  "baseUrl": "https://slsea-solar-generation-bh5ldbe4g-thisajams-projects.vercel.app",
+  "deployment": "9euc4ip67rt5qS8BZWrr9YiBhgCN",
+  "branch": "preview-smoke-test",
+  "commit": "62f733a6ecb6adba646e2a95c52cd2a753fcbcf9",
+  "buildStatus": "Ready",
+  "environmentConfiguration": {
+    "verifiedBy": "Vercel Preview settings; no values revealed",
+    "variables": [
+      "MONGODB_URI",
+      "JWT_SECRET",
+      "JWT_EXPIRES_IN",
+      "CORS_ORIGIN"
+    ]
+  },
+  "readOnly": true,
+  "results": [
+    {
+      "check": "Swagger UI renders operations and schemas in signed-in browser",
+      "passed": true
+    },
+    {
+      "check": "GET /health through Swagger returns 200 and database connected",
+      "passed": true
+    },
+    {
+      "check": "Unauthenticated GET /api/v1/provinces through Swagger returns 401",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Public automated requests redirect to Vercel authentication (302).",
+    "Extended four-role login, scope, count and conditional-request suite was not completed against Preview; production results remain in LIVE-DEPLOYMENT-VERIFICATION.json."
+  ],
+  "dataModified": false
+}

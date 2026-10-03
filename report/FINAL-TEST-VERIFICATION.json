@@ -1,0 +1,14 @@
+{
+  "verifiedAt": "2026-10-03T21:51:40.058Z",
+  "command": "npm test",
+  "exitCode": 0,
+  "summary": [
+    "PASS tests/seed.test.js (18.262 s)",
+    "PASS tests/api.test.js",
+    "PASS tests/schema.test.js",
+    "Test Suites: 3 passed, 3 total",
+    "Tests:       82 passed, 82 total",
+    "Time:        20.495 s, estimated 21 s"
+  ],
+  "isolatedDatabase": true
+}

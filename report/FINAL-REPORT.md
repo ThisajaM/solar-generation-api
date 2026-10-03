@@ -1,12 +1,14 @@
 # Final implementation report
 
-Date: 2026-09-29, Asia/Colombo. The API is implemented and tested locally with real disposable MongoDB processes. Live Atlas and Vercel verification is blocked by missing credentials and project configuration.
+> This AI-assisted engineering log is not the student-authored assessed report. The official-document review in OFFICIAL-ASSESSMENT-AUDIT.md supersedes earlier blanket compliance statements. The brief requires a 2250-2750-word student justification and prohibits AI-generated report prose.
+
+Initial report: 2026-09-29; deployment follow-up: 2026-10-03 (Asia/Colombo). Production deployment and Atlas connectivity verified on 2026-10-03. Live API: https://project-n8zne.vercel.app. Evidence: report/LIVE-DEPLOYMENT-VERIFICATION.json. Preview configuration and deployment verified on 2026-10-04 (Asia/Colombo). Browser smoke checks passed: Swagger renders, health returns 200 with MongoDB connected, and unauthenticated resource access returns 401. Vercel protection redirects public automated requests to sign-in, so the extended Preview suite remains unverified. Evidence: report/PREVIEW-DEPLOYMENT-VERIFICATION.json.
 
 ## 1. Overall status
 
 **VERIFIED:** Express/Mongoose API, all six required entities, append-only readings, scoped JWT access, hierarchical and top-level reads, pagination/filtering/sorting, HTTP validators, summary calculations, full-size seed, BSON-preserving export/import, Swagger document/assets, and production-mode local HTTP startup.
 
-**NOT VERIFIED:** Atlas connectivity, Vercel platform build/deployment, deployed Swagger, and official MongoDB Database Tools command execution. Vercel deployment could not be executed from this environment.
+**LIVE VERIFIED (2026-10-03):** Production build, Atlas health, Swagger HTML/JS, JWT login for all four demo roles, scoped reads, 134,400 readings and conditional HTTP behavior. **NOT VERIFIED:** official MongoDB Database Tools command execution and extended automated Preview tests. Preview deployment and browser smoke checks passed; Vercel protection blocks the public automated suite.
 
 ## 2. Files created
 
@@ -101,7 +103,7 @@ National analysts see all jurisdictions; province analysts see their province; d
 
 ## 10. Swagger URL
 
-Local: `http://localhost:3000/docs`; spec: `http://localhost:3000/openapi.json`. No hosted URL exists from this session. Authorize with the bare token; Swagger supplies the Bearer prefix. `npm run docs:validate` verifies OpenAPI schemas and references.
+Local: `http://localhost:3000/docs`; spec: `http://localhost:3000/openapi.json`. Live Swagger: https://project-n8zne.vercel.app/docs/; health: https://project-n8zne.vercel.app/health. Authorize with the bare token; Swagger supplies the Bearer prefix. `npm run docs:validate` verifies OpenAPI schemas and references.
 
 ## 11–13. MongoDB setup, export and import
 
@@ -119,7 +121,7 @@ Use Node 22.x. Run `npm install`, copy `.env.example` to `.env`, set MONGODB_URI
 
 Authenticate/link with `npx vercel login` and `npx vercel link`, or import a real Git repository in Vercel. Use Node 22.x and Other preset; retain supplied vercel.json. Add MONGODB_URI, JWT_SECRET, JWT_EXPIRES_IN and CORS_ORIGIN for Preview/Production. Deploy a preview, verify `/health`, docs assets, login and scoped reads/ingestion, then deploy production. Seed Atlas separately from a trusted local process. The exported function requires no listener and caches the MongoDB connection.
 
-Vercel deployment could not be executed from this environment.
+Production deployment succeeded on 2026-10-03 from commit 62f733a; see LIVE-DEPLOYMENT-VERIFICATION.json.
 
 ## 16. Environment variables
 
@@ -131,7 +133,7 @@ See TEST-RESULTS.md for actual final counts and commands. Verification includes 
 
 ## 19. Unresolved issues and practical limits
 
-- Atlas and Vercel credentials/project were unavailable; live checks remain outstanding.
+- Preview deployment, Swagger, database health and unauthenticated rejection are verified in the signed-in browser. Extended automated Preview tests are blocked by Vercel protection. Production deployment and Atlas connectivity are verified.
 - Official mongoexport/mongoimport executable behavior was not tested; equivalent Node exporter/driver round trip was.
 - Summary daily energy cannot reconstruct meter resets or missing intervals; stale last-known power is explicitly documented.
 - Process-local rate limiting is suitable for coursework, not a global distributed quota.
@@ -141,11 +143,11 @@ See TEST-RESULTS.md for actual final counts and commands. Verification includes 
 
 ## 20. Rubric audit
 
-COURSEWORK-AUDIT.md contains the requested table and every numbered prompt section. Functional local requirements pass; deployment-specific sections remain PARTIAL. Richardson Level 2 is deliberate. Requiring full mutable CRUD would contradict the explicit append-only history rule, so no destructive historical mutation remains.
+COURSEWORK-AUDIT.md contains the requested table and every numbered prompt section. Functional local requirements pass; deployment-specific sections have been updated with the 2026-10-03 production evidence. Richardson Level 2 is deliberate. The official brief requires both append-only readings and CRUD semantics, and the rubric explicitly asks for full CRUD. No update/delete resource exists; this is an unresolved assessment issue, not confirmed full compliance. See OFFICIAL-ASSESSMENT-AUDIT.md.
 
 ## 21. Before submission
 
-Configure Atlas, seed it intentionally, deploy to Vercel, verify live behavior and record the real URLs/results. Review the course rubric with the append-only design rationale. Complete the AI disclosure and personally rerun commands. Keep genuine process evidence; do not manufacture earlier commits or claim the AI's testing as work you personally performed.
+Atlas has been seeded and production deployed. Personally verify live behavior and retain the recorded URLs/results. Review the course rubric with the append-only design rationale. Complete the AI disclosure and personally rerun commands. Keep genuine process evidence; do not manufacture earlier commits or claim the AI's testing as work you personally performed.
 
 ## 22. Viva demonstration
 

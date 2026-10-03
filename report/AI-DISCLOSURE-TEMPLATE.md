@@ -63,7 +63,15 @@ I can explain the code I am submitting and I take responsibility for it.
 - Prompt: “MASTER PROMPT — AUDIT, FIX, COMPLETE AND DEPLOY MY NB6007CEM REST API”; retain the supplied full prompt separately if required.
 - Task: inspect the existing API, correct historical integrity, validation, authorization, HTTP caching, seed/export, documentation and deployment readiness.
 - Code generated/modified: see the file inventory in FINAL-REPORT.md. Existing architecture and correct implementation were retained.
-- Testing by AI: actual local commands and outcomes are in COURSEWORK-AUDIT.md and TEST-RESULTS.md. No live Atlas/Vercel results are claimed.
+- Testing by AI: actual local commands and outcomes are in COURSEWORK-AUDIT.md and TEST-RESULTS.md. Subsequent live Atlas and Vercel checks are recorded in the JSON evidence files; distinguish AI-performed tests from tests personally performed by the student.
 - Student modifications: [complete this yourself].
 - Student tests personally rerun and their results: [complete this yourself].
 - Explanation of the code and independent verification: [complete this yourself; do not present the AI's tests as tests you personally performed].
+
+
+### Follow-up assistance to disclose
+
+- 2026-10-03/04: Atlas connection and authorized six-collection reseeding; Vercel configuration, Preview and production checks; official assessment PDF comparison; secret-output removal from the seed script; repeatable seed and API verification scripts.
+- Retain the user's exact prompts for these sessions alongside the original master prompt. This summary is not a complete prompt archive.
+- Official-document review identified an unresolved CRUD versus append-only conflict. Do not describe CRUD as complete without an authoritative resolution.
+- Student-authored report prose, personal tests, declaration signature, and viva understanding remain for the student to complete truthfully.

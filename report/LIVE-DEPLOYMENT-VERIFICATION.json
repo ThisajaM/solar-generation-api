@@ -1,0 +1,37 @@
+{
+  "verifiedAt": "2026-10-03T16:31:13.969Z",
+  "baseUrl": "https://project-n8zne.vercel.app",
+  "deployment": "7bJbEDhcTPQLrPewbrUEX5Rbs73t",
+  "commit": "62f733a6ecb6adba646e2a95c52cd2a753fcbcf9",
+  "readOnly": true,
+  "results": [
+    {
+      "check": "All four demo roles can log in",
+      "passed": true
+    },
+    {
+      "check": "Live collection counts: 9 provinces, 25 districts, 27 substations, 200 installations, 134400 readings",
+      "passed": true
+    },
+    {
+      "check": "District/province scope and forbidden foreign district",
+      "passed": true
+    },
+    {
+      "check": "Device own composite and latest reading",
+      "passed": true
+    },
+    {
+      "check": "672 own readings, pagination, timestamp sorting and time filter",
+      "passed": true
+    },
+    {
+      "check": "ETag, Last-Modified, bodyless 304 and failed precondition 412",
+      "passed": true
+    },
+    {
+      "check": "District summary and public noncredentialed CORS",
+      "passed": true
+    }
+  ]
+}
