@@ -1,0 +1,69 @@
+# AI assistance disclosure (template)
+
+Complete this in your own words before submission. Do not paste production secrets.
+
+## Tool
+
+- Name and version (for example Cursor, model name as shown in the product):
+- Date(s) used:
+
+## Prompt / task
+
+Summarise what you asked the tool to do (audit, complete REST API, seed, Swagger, Vercel, tests, documentation).
+
+Keep a copy of the master prompt if the module requires prompt evidence.
+
+## Code generated
+
+List areas the tool produced or substantially edited, for example:
+
+- Express routes and middleware
+- Mongoose models
+- Seed / export scripts
+- OpenAPI document
+- Jest tests
+- README / audit files
+
+## Modifications you made
+
+Record any edits you performed yourself after generation (credentials, Atlas URI, Vercel project, report prose, extra comments).
+
+## Testing you performed
+
+Record commands and results you actually ran:
+
+- `npm install`
+- `npm test`
+- `npm run lint`
+- `npm run seed` (Atlas or local)
+- `npm run export:seed`
+- `npm run dev` and manual curl/Swagger checks
+- Vercel deploy URL (if any)
+
+Do not invent results you did not observe.
+
+## Understanding / viva notes
+
+Write a short explanation you can defend:
+
+- Why GenerationReading is a separate collection
+- Why last-reading queries the time series
+- How district vs national JWT scope is enforced
+- How pagination metadata is computed
+- How ETag / 304 works
+- How the district summary aggregation is calculated
+- How Vercel reuses the MongoDB connection
+
+I can explain the code I am submitting and I take responsibility for it.
+
+## Recorded assistance in this session
+
+- AI tool: OpenAI Codex desktop (student should record the model shown in the app).
+- Date: 2026-09-29, Asia/Colombo.
+- Prompt: “MASTER PROMPT — AUDIT, FIX, COMPLETE AND DEPLOY MY NB6007CEM REST API”; retain the supplied full prompt separately if required.
+- Task: inspect the existing API, correct historical integrity, validation, authorization, HTTP caching, seed/export, documentation and deployment readiness.
+- Code generated/modified: see the file inventory in FINAL-REPORT.md. Existing architecture and correct implementation were retained.
+- Testing by AI: actual local commands and outcomes are in COURSEWORK-AUDIT.md and TEST-RESULTS.md. No live Atlas/Vercel results are claimed.
+- Student modifications: [complete this yourself].
+- Student tests personally rerun and their results: [complete this yourself].
+- Explanation of the code and independent verification: [complete this yourself; do not present the AI's tests as tests you personally performed].
