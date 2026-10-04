@@ -1,0 +1,32 @@
+{
+  "verifiedAt": "2026-10-04T03:21:33.127Z",
+  "sourceCommit": "ee82d5c2a051f106548e22dc1cdefd2c3faf8bf0",
+  "localDeploymentChange": ".vercelignore added to exclude private files",
+  "preview": {
+    "status": "ok",
+    "id": "dpl_8Nz8CjKynwm8csz9NxpQakugLBfm",
+    "url": "https://slsea-solar-generation-4zqn5temt-thisajams-projects.vercel.app",
+    "readyState": "READY",
+    "target": null,
+    "inspectorUrl": "https://vercel.com/thisajams-projects/slsea-solar-generation-api/8Nz8CjKynwm8csz9NxpQakugLBfm"
+  },
+  "production": {
+    "status": "ok",
+    "id": "dpl_8NqvRs93iXnMWcXzYfBp8GzEePeb",
+    "url": "https://slsea-solar-generation-386mfztqq-thisajams-projects.vercel.app",
+    "productionUrl": "https://project-n8zne.vercel.app",
+    "inspectorUrl": "https://vercel.com/thisajams-projects/slsea-solar-generation-api/8NqvRs93iXnMWcXzYfBp8GzEePeb",
+    "readyState": "READY",
+    "target": "production"
+  },
+  "previewSmokeGroups": 14,
+  "productionSmokeGroups": 14,
+  "previewPassedBeforeProduction": true,
+  "previewProtectionPreserved": true,
+  "uploadPreflight": {
+    "privateFilesExcluded": true,
+    "fileCount": 53
+  },
+  "environmentValuesRecorded": false,
+  "databaseWrites": "Only rejected write attempts; reading count remains 134400"
+}

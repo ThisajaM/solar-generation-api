@@ -2,13 +2,13 @@
 
 > This AI-assisted engineering log is not the student-authored assessed report. The official-document review in OFFICIAL-ASSESSMENT-AUDIT.md supersedes earlier blanket compliance statements. The brief requires a 2250-2750-word student justification and prohibits AI-generated report prose.
 
-Initial report: 2026-09-29; deployment follow-up: 2026-10-03 (Asia/Colombo). Production deployment and Atlas connectivity verified on 2026-10-03. Live API: https://project-n8zne.vercel.app. Evidence: report/LIVE-DEPLOYMENT-VERIFICATION.json. Preview configuration and deployment verified on 2026-10-04 (Asia/Colombo). Browser smoke checks passed: Swagger renders, health returns 200 with MongoDB connected, and unauthenticated resource access returns 401. Vercel protection redirects public automated requests to sign-in, so the extended Preview suite remains unverified. Evidence: report/PREVIEW-DEPLOYMENT-VERIFICATION.json.
+Initial report: 2026-09-29; deployment follow-up: 2026-10-03 (Asia/Colombo). Production deployment and Atlas connectivity verified on 2026-10-03. Live API: https://project-n8zne.vercel.app. Evidence: report/LIVE-DEPLOYMENT-VERIFICATION.json. A new protected Preview passed all 14 smoke groups through authenticated CLI requests on 2026-10-04 (Asia/Colombo). Only then was a new Production deployment created; all 14 public production smoke groups passed. See report/RELEASE-VERIFICATION.json, report/NEW-PREVIEW-SMOKE.json and report/NEW-PRODUCTION-SMOKE.json. Environment values were not recorded.
 
 ## 1. Overall status
 
 **VERIFIED:** Express/Mongoose API, all six required entities, append-only readings, scoped JWT access, hierarchical and top-level reads, pagination/filtering/sorting, HTTP validators, summary calculations, full-size seed, BSON-preserving export/import, Swagger document/assets, and production-mode local HTTP startup.
 
-**LIVE VERIFIED (2026-10-03):** Production build, Atlas health, Swagger HTML/JS, JWT login for all four demo roles, scoped reads, 134,400 readings and conditional HTTP behavior. **NOT VERIFIED:** official MongoDB Database Tools command execution and extended automated Preview tests. Preview deployment and browser smoke checks passed; Vercel protection blocks the public automated suite.
+**LIVE VERIFIED (2026-10-03):** Production build, Atlas health, Swagger HTML/JS, JWT login for all four demo roles, scoped reads, 134,400 readings and conditional HTTP behavior. **NOT VERIFIED:** official MongoDB Database Tools command execution. The subsequent protected Preview and public Production each passed all 14 smoke groups; see RELEASE-VERIFICATION.json.
 
 ## 2. Files created
 
@@ -133,7 +133,7 @@ See TEST-RESULTS.md for actual final counts and commands. Verification includes 
 
 ## 19. Unresolved issues and practical limits
 
-- Preview deployment, Swagger, database health and unauthenticated rejection are verified in the signed-in browser. Extended automated Preview tests are blocked by Vercel protection. Production deployment and Atlas connectivity are verified.
+- New Preview and Production deployments each passed 14 smoke groups, with authenticated CLI access used for protected Preview. See RELEASE-VERIFICATION.json.
 - Official mongoexport/mongoimport executable behavior was not tested; equivalent Node exporter/driver round trip was.
 - Summary daily energy cannot reconstruct meter resets or missing intervals; stale last-known power is explicitly documented.
 - Process-local rate limiting is suitable for coursework, not a global distributed quota.

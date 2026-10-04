@@ -1,0 +1,26 @@
+{
+  "verifiedAt": "2026-10-04T03:16:46.330Z",
+  "checks": [
+    {
+      "environment": "preview",
+      "success": true,
+      "requiredNamesPresent": [
+        "MONGODB_URI",
+        "JWT_SECRET",
+        "JWT_EXPIRES_IN",
+        "CORS_ORIGIN"
+      ]
+    },
+    {
+      "environment": "production",
+      "success": true,
+      "requiredNamesPresent": [
+        "MONGODB_URI",
+        "JWT_SECRET",
+        "JWT_EXPIRES_IN",
+        "CORS_ORIGIN"
+      ]
+    }
+  ],
+  "valuesRecorded": false
+}

@@ -63,7 +63,7 @@ No failed checks were silently skipped. Tests exit normally without Jest forceEx
 
 ## Live deployment follow-up — 2026-10-03
 
-Production deployment and Atlas connectivity verified on 2026-10-03. Live API: https://project-n8zne.vercel.app. Evidence: report/LIVE-DEPLOYMENT-VERIFICATION.json. Preview configuration and deployment verified on 2026-10-04 (Asia/Colombo). Browser smoke checks passed: Swagger renders, health returns 200 with MongoDB connected, and unauthenticated resource access returns 401. Vercel protection redirects public automated requests to sign-in, so the extended Preview suite remains unverified. Evidence: report/PREVIEW-DEPLOYMENT-VERIFICATION.json.
+Production deployment and Atlas connectivity verified on 2026-10-03. Live API: https://project-n8zne.vercel.app. Evidence: report/LIVE-DEPLOYMENT-VERIFICATION.json. A new protected Preview passed all 14 smoke groups through authenticated CLI requests on 2026-10-04 (Asia/Colombo). Only then was a new Production deployment created; all 14 public production smoke groups passed. See report/RELEASE-VERIFICATION.json, report/NEW-PREVIEW-SMOKE.json and report/NEW-PRODUCTION-SMOKE.json. Environment values were not recorded.
 
 Read-only HTTPS smoke checks passed; no new generation readings were inserted. All four demo roles authenticated. Collection counts matched, and scope, pagination, date filtering, ETag/304, If-Match/412, summary and CORS checks passed. The independently verified Atlas demo-user count remains 227 from the reseed verification. Official Database Tools remain untested.
 
@@ -75,5 +75,5 @@ Read-only HTTPS smoke checks passed; no new generation readings were inserted. A
 - Dedicated Atlas reseed and independent exact-count check: passed; see ATLAS-SEED-VERIFICATION.json.
 - Local application against Atlas: 14 smoke groups passed; see LOCAL-ATLAS-VERIFICATION.json.
 - Existing public production after reseed: 14 smoke groups passed; see PRODUCTION-RECHECK.json.
-- New Preview/production release: blocked by missing CLI authentication; prior protected Preview browser evidence is separate.
+- New Preview and Production deployed in order: 14 smoke groups passed on each; see RELEASE-VERIFICATION.json. Preview protection was retained.
 - Update/delete CRUD: absent and unresolved against conflicting official requirements, not marked PASS.

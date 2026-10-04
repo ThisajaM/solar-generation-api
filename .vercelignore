@@ -1,0 +1,12 @@
+.env
+.env.*
+.vercel
+.git
+.cursor
+node_modules
+coverage
+seed-output
+report
+tests
+*.log
+.DS_Store

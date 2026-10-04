@@ -21,7 +21,7 @@ Initial audit: 2026-09-29; production follow-up: 2026-10-03 (Asia/Colombo). **Lo
 | Swagger | PASS (local) | Formal OpenAPI validation, concrete response schemas, assets served | src/docs/openapi.js; /docs; /openapi.json | Live Vercel HTML/JS assets verified 2026-10-03 |
 | MongoDB export | PASS | All six collections exported then imported into second isolated DB; BSON dates/IDs and counts checked | scripts/export-seed.js; tests/seed.test.js | Canonical Extended JSON; actual DB export; mongoimport CLI itself unavailable |
 | MongoDB import/indexes | PASS (driver) | Export round trip and npm run indexes executed | scripts/create-indexes.js; README | Official mongoimport commands documented; that binary not installed |
-| Vercel readiness | PASS (Production) | Production build ready; live HTTP and Swagger assets passed | api/index.js; vercel.json | Preview browser smoke passed; extended automated suite blocked by Vercel protection |
+| Vercel readiness | PASS (Production) | Production build ready; live HTTP and Swagger assets passed | api/index.js; vercel.json | New protected Preview and public Production each passed 14 smoke groups |
 | Atlas compatibility | PASS | Atlas seed and counts verified; deployed health connected | config/database.js; .env.example | Credentials never disclosed |
 | District summary | PASS | Actual MongoDB lookups; expected power/energy assertion; future record excluded; stable ETag | summaryService.js | Baseline at/before midnight, fallback first today; reset/missing-data undercount documented |
 
@@ -75,11 +75,11 @@ Initial audit: 2026-09-29; production follow-up: 2026-10-03 (Asia/Colombo). **Lo
 | 44 AI disclosure | PASS (template) | Template updated; student must complete personal verification |
 | 45 Final validation | PASS | Local tests plus successful Vercel production build and HTTP checks |
 | 46 Final report | PASS | report/FINAL-REPORT.md and final response |
-| 47 Quality gate | PASS (Production) | Local implementation and live Atlas/Vercel production checks complete; Preview configured and browser smoke passed; extended suite blocked by Vercel protection |
+| 47 Quality gate | PASS (Production) | Local implementation and live Atlas/Vercel production checks complete; New Preview passed before Production; both passed 14 smoke groups |
 
 ## Limits and blockers
 
-Production deployment and Atlas connectivity verified on 2026-10-03. Live API: https://project-n8zne.vercel.app. Evidence: report/LIVE-DEPLOYMENT-VERIFICATION.json. Preview configuration and deployment verified on 2026-10-04 (Asia/Colombo). Browser smoke checks passed: Swagger renders, health returns 200 with MongoDB connected, and unauthenticated resource access returns 401. Vercel protection redirects public automated requests to sign-in, so the extended Preview suite remains unverified. Evidence: report/PREVIEW-DEPLOYMENT-VERIFICATION.json.
+Production deployment and Atlas connectivity verified on 2026-10-03. Live API: https://project-n8zne.vercel.app. Evidence: report/LIVE-DEPLOYMENT-VERIFICATION.json. A new protected Preview passed all 14 smoke groups through authenticated CLI requests on 2026-10-04 (Asia/Colombo). Only then was a new Production deployment created; all 14 public production smoke groups passed. See report/RELEASE-VERIFICATION.json, report/NEW-PREVIEW-SMOKE.json and report/NEW-PRODUCTION-SMOKE.json. Environment values were not recorded.
 
 At the initial audit, no Atlas URI, Vercel authentication/project or Git repository was present. The user subsequently configured Atlas and GitHub; the project is now connected and deployed through the authenticated Vercel dashboard. MongoDB integration **was** runtime-tested using a real disposable local mongod; it would be inaccurate to say no MongoDB connection was available. Official mongoexport/mongoimport binaries were absent; the shipped Node exporter and a driver-based import were exercised instead.
 

@@ -4,7 +4,7 @@ Follow-up: 2026-10-04, Asia/Colombo. This is a technical handover, not the stude
 
 ## Outcome
 
-The existing public production API is operational against the freshly reseeded coursework Atlas database. Local and public production smoke checks passed. A new Preview/release cycle is blocked: the Vercel CLI available to this checkout reports unauthenticated and `.vercel/project.json` is absent. No new production deployment was made without the required Preview gate.
+The new protected Preview passed all 14 smoke groups using authenticated Vercel CLI requests. Only after that success was a new Production deployment created. All 14 public production smoke groups then passed. See RELEASE-VERIFICATION.json for deployment identifiers and NEW-PREVIEW-SMOKE.json / NEW-PRODUCTION-SMOKE.json for check results. The CLI targets the existing coursework project explicitly by ID.
 
 Full assessment completion also remains blocked on the official CRUD ambiguity and personal submission requirements. Passing technical tests does not establish eligibility or guarantee marks.
 
@@ -81,18 +81,18 @@ Production database health and authenticated requests show database/signing conf
 - Public Swagger: https://project-n8zne.vercel.app/docs/
 - Existing Preview: https://slsea-solar-generation-bh5ldbe4g-thisajams-projects.vercel.app
 - Prior Preview evidence: Ready build; signed-in Swagger, health 200 and missing-bearer 401. Extended public requests redirect to Vercel sign-in. See `PREVIEW-DEPLOYMENT-VERIFICATION.json`.
-- New CLI verification: official CLI 62.2.0 was available through npm, but `whoami` exited unsuccessfully and indicated login was required. No local link was present. Credentials were never printed.
-- New Preview: not deployed; blocked on CLI authentication. Protection was not disabled or weakened.
-- New production: not deployed; correctly held behind a passing new Preview. The production URL above is the existing deployment, freshly retested after reseeding.
+- CLI 62.2.0 authentication now succeeds. Link was refreshed; deployment commands explicitly selected the known existing project ID. Credentials were never printed.
+- New Preview: https://slsea-solar-generation-4zqn5temt-thisajams-projects.vercel.app — READY; all 14 smoke groups passed through authenticated CLI requests. Protection remains enabled.
+- New Production: https://slsea-solar-generation-386mfztqq-thisajams-projects.vercel.app — READY; public alias remains https://project-n8zne.vercel.app. All 14 public smoke groups passed.
 
-To resume: authenticate with `npx vercel login` in this environment. Then link the existing project, inspect environment names/scopes only, deploy Preview and use authenticated protection-aware tooling for smoke tests. Deploy production only after those checks pass. Do not create a duplicate project or remove Preview protection just to bypass the blocker.
+Deployment is complete. Required environment names were verified for Preview and Production without values. The upload dry run initially included `.env`; `.vercelignore` fixed this before upload. The verified upload excluded environment files and private metadata. CLI-created `.env.local` remains gitignored. Public smoke checks preserved all database counts.
 
 ## Remaining assessment and operational limitations
 
 1. The brief requires append-only readings and restricts devices/analysts, while it and the rubric also call for CRUD. An authoritative answer identifying the mutable resource and actor is still needed. Do not silently grant analyst writes or overwrite historical data.
 2. The referenced module REST API Design Guidelines white paper is not available for an exact standards comparison.
 3. Lecturer collaborator access has not been verified. Vercel GitHub access and a public repository do not prove this condition.
-4. Git history contains one initial commit. Keep genuine future increments; do not fabricate earlier history. Follow-up changes remain local and uncommitted.
+4. The new release used checkout commit `ee82d5c` plus the local `.vercelignore` safeguard. New release evidence/documentation remains local and uncommitted. Keep genuine increments; do not fabricate earlier history.
 5. The independently authored 2250-2750-word justification, signed declaration and completed prompt/AI appendix remain student responsibilities. The existing AI engineering report is not a compliant substitute.
 6. Viva attendance and the ability to explain every artifact remain personal requirements.
 7. Summary data can be stale; meter resets/missing boundary readings limit daily-energy interpretation. Rate limiting is per process; pagination is not snapshot-consistent during concurrent writes.
@@ -106,7 +106,7 @@ To resume: authenticate with `npx vercel login` in this environment. Then link t
 - [x] Check ignored/private files and reachable Git history for credential findings.
 - [x] Validate OpenAPI and retain setup/test/seed/deployment instructions.
 - [ ] Resolve CRUD interpretation and implement/test only the confirmed missing surface.
-- [ ] Authenticate/link CLI; pass new protected Preview, then deploy and retest production.
+- [x] Authenticate CLI; pass new protected Preview, then deploy and retest production.
 - [ ] Obtain/review the module design-guidelines white paper.
 - [ ] Share repository with module leader as collaborator and verify access.
 - [ ] Commit genuine remaining increments; preserve honest history.

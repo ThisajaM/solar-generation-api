@@ -1,0 +1,63 @@
+{
+  "verifiedAt": "2026-10-04T03:20:11.383Z",
+  "baseUrl": "https://project-n8zne.vercel.app",
+  "preservesData": true,
+  "results": [
+    {
+      "check": "Health confirms MongoDB connection",
+      "passed": true
+    },
+    {
+      "check": "Swagger and OpenAPI load",
+      "passed": true
+    },
+    {
+      "check": "Missing bearer token is rejected",
+      "passed": true
+    },
+    {
+      "check": "All four demo roles can log in",
+      "passed": true
+    },
+    {
+      "check": "Live collection counts: 9 provinces, 25 districts, 27 substations, 200 installations, 134400 readings",
+      "passed": true
+    },
+    {
+      "check": "District/province scope and forbidden foreign district",
+      "passed": true
+    },
+    {
+      "check": "Device own composite and latest reading",
+      "passed": true
+    },
+    {
+      "check": "672 own readings, pagination, timestamp sorting and time filter",
+      "passed": true
+    },
+    {
+      "check": "ETag, Last-Modified, bodyless 304 and failed precondition 412",
+      "passed": true
+    },
+    {
+      "check": "District summary and public noncredentialed CORS",
+      "passed": true
+    },
+    {
+      "check": "Hierarchy atomic and nested resources are reachable",
+      "passed": true
+    },
+    {
+      "check": "Write authorization and invalid input preserve database",
+      "passed": true
+    },
+    {
+      "check": "Validation and consistent client errors",
+      "passed": true
+    },
+    {
+      "check": "Readings count remains exactly 134400",
+      "passed": true
+    }
+  ]
+}

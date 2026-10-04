@@ -96,3 +96,8 @@ Next priorities: resolve the CRUD ambiguity and obtain the referenced design whi
 The subsequent authorized completion pass reseeded Atlas and verified exactly 9 provinces, 25 districts, 27 substations, 200 installations, 134400 readings and 227 principals. All 82 tests passed again (final run: 3 suites, 20.495 seconds). Local Atlas and existing production each passed 14 smoke groups; successful reading creation remains tested in isolated MongoDB, while Atlas checks preserve its exact counts. Seed output no longer prints passwords; repeatable verification commands were added.
 
 The eight-dimension conclusions above remain substantively unchanged: technical read/ingestion/security coverage is supported, but full CRUD is unresolved; submission/report/collaborator/viva evidence is still incomplete. No invented resource or role was introduced. The available Vercel CLI is unauthenticated and the checkout is unlinked, so no new Preview or production release occurred; existing production was reverified. See COMPLETION-STATUS.md for the full result and gated release steps.
+
+
+## Deployment blocker resolved
+
+The subsequent release deployed a new protected Preview and verified all 14 smoke groups through authenticated CLI access, then created a new Production deployment and passed the same 14 public checks. Preview protection remains enabled. Required variable names were verified in both environments without recording values. The deployment dry run exposed an upload-exclusion gap, fixed with `.vercelignore` before upload. See RELEASE-VERIFICATION.json. Checkout now has a further genuine commit, `ee82d5c`; earlier one-commit findings describe the audit-time state. CRUD clarification and personal submission requirements remain unresolved.
