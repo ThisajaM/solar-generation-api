@@ -1,0 +1,51 @@
+{
+  "verifiedAt": "2026-10-09T17:29:37.107Z",
+  "connected": true,
+  "collections": {
+    "provinces": {
+      "count": 9,
+      "contentDigest": "8e26a86d41cbd55c9699c578739930e2d43adb2ef2ca350ddbd8511a3e1edcf8"
+    },
+    "districts": {
+      "count": 25,
+      "contentDigest": "e6fada8cc0874a3e77bf8568ff2f063ffb382faca951583955be1c00f123f335"
+    },
+    "substations": {
+      "count": 27,
+      "contentDigest": "b78e0a16603c7bfc58010327142e7ad213a234248cea52fbd027a0719924f669"
+    },
+    "solarinstallations": {
+      "count": 200,
+      "contentDigest": "e347d00b0fa69e13f95337b7870052515ff27b52bef40d2f460e11e31a5ebd74"
+    },
+    "generationreadings": {
+      "count": 134400,
+      "contentDigest": "a38f8a06e08e730519259e20129658be8ae14e3aa13af76013e43ee220e70328"
+    },
+    "users": {
+      "count": 227,
+      "contentDigest": "246626b6cb9beb834499e672ee8a30518a30c69ce899ac197568da61a8d56f93"
+    }
+  },
+  "readingIndexes": [
+    {
+      "key": {
+        "_id": 1
+      },
+      "unique": false
+    },
+    {
+      "key": {
+        "installation": 1,
+        "timestamp": 1
+      },
+      "unique": true
+    },
+    {
+      "key": {
+        "timestamp": -1
+      },
+      "unique": false
+    }
+  ]
+}

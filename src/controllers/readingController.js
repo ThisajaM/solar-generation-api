@@ -1,3 +1,4 @@
+const { freshness } = require('../utils/readingQuality');
 const readingService = require('../services/readingService');
 const { sendError } = require('../utils/http');
 const { applyValidators, isNotModified } = require('../utils/etag');
@@ -33,9 +34,9 @@ async function lastReading(req, res) {
   const installation = req.authorizedInstallation;
   if (!installation) return sendError(res, 404, 'NOT_FOUND', 'Installation not found', null);
   const reading = await readingService.lastReading(installation._id);
-  if (!reading) return sendError(res, 404, 'NOT_FOUND', 'No generation reading exists for this installation', null);
-  const payload = { data: reading };
-  const lastModified = reading.updatedAt || reading.timestamp;
+  if (!reading) return sendError(res, 404, 'NOT_FOUND', 'No generation reading exists for this installation', freshness(null));
+  const payload = { data: reading, freshness: freshness(reading) };
+  const lastModified = undefined; // Freshness changes with server time, independently of storage.
   const etag = applyValidators(res, payload, lastModified);
   if (isNotModified(req, etag, lastModified)) return res.status(304).end();
   return res.json(payload);

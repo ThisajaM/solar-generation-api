@@ -1,0 +1,38 @@
+{
+  "verifiedAt": "2026-10-09T18:05:09.474Z",
+  "allSixCollectionsUnchanged": true,
+  "readingIndexesUnchanged": true,
+  "collections": {
+    "provinces": {
+      "countBefore": 9,
+      "countAfter": 9,
+      "digestUnchanged": true
+    },
+    "districts": {
+      "countBefore": 25,
+      "countAfter": 25,
+      "digestUnchanged": true
+    },
+    "substations": {
+      "countBefore": 27,
+      "countAfter": 27,
+      "digestUnchanged": true
+    },
+    "solarinstallations": {
+      "countBefore": 200,
+      "countAfter": 200,
+      "digestUnchanged": true
+    },
+    "generationreadings": {
+      "countBefore": 134400,
+      "countAfter": 134400,
+      "digestUnchanged": true
+    },
+    "users": {
+      "countBefore": 227,
+      "countAfter": 227,
+      "digestUnchanged": true
+    }
+  },
+  "method": "Read-only SHA-256 of sorted BSON documents; sequential comparison, not a transactional snapshot"
+}

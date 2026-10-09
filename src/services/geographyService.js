@@ -1,3 +1,4 @@
+const { freshness } = require('../utils/readingQuality');
 const Province = require('../models/Province');
 const District = require('../models/District');
 const Substation = require('../models/Substation');
@@ -78,7 +79,8 @@ async function getComposite(installationId) {
       name: installation.substation.district.province.name,
       code: installation.substation.district.province.code
     } : null,
-    latestReading
+    latestReading,
+    latestReadingFreshness: freshness(latestReading)
   };
 }
 

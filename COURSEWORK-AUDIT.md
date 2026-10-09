@@ -1,8 +1,8 @@
 # Coursework audit — NB6007CEM
 
-> Official-document review (2026-10-04): [OFFICIAL-ASSESSMENT-AUDIT.md](report/OFFICIAL-ASSESSMENT-AUDIT.md) supersedes earlier compliance conclusions. Technical PASS rows do not establish assessment eligibility or full CRUD compliance.
+> Official-document review (2026-10-04): [report/OFFICIAL-ASSESSMENT-AUDIT.md](report/OFFICIAL-ASSESSMENT-AUDIT.md) supersedes earlier compliance conclusions. Technical PASS rows do not establish assessment eligibility or full CRUD compliance.
 
-Initial audit: 2026-09-29; production follow-up: 2026-10-03 (Asia/Colombo). **Locally and live verified.** Production evidence is recorded in report/LIVE-DEPLOYMENT-VERIFICATION.json. The original audit is in `report/INITIAL-AUDIT.md`.
+Initial audit: 2026-09-29; production follow-up: 2026-10-03 (Asia/Colombo). **Locally and live verified.** Production evidence is recorded in report/archive/LIVE-DEPLOYMENT-VERIFICATION.json. The original audit is in `report/archive/INITIAL-AUDIT.md`.
 
 | Requirement | Status | Evidence | File/Route | Notes |
 | --- | --- | --- | --- | --- |
@@ -30,7 +30,7 @@ Initial audit: 2026-09-29; production follow-up: 2026-10-03 (Asia/Colombo). **Lo
 | Prompt section | Status | Evidence / interpretation |
 | --- | --- | --- |
 | 1 Domain | PASS | Six collections and hierarchy; no separate Device |
-| 2 Initial audit | PASS | All repository implementation/config/docs/tests inspected; INITIAL-AUDIT.md created before edits |
+| 2 Initial audit | PASS | All repository implementation/config/docs/tests inspected; report/archive/INITIAL-AUDIT.md created before edits |
 | 3 Technology | PASS | Node 22, Express 5, Mongoose 8, bcryptjs/JWT, OpenAPI 3 |
 | 4 Architecture | PASS | Existing layers retained |
 | 5 Models/indexes | PASS | Optional identifier collision fixed; unique installation/timestamp; finite readings; role/scope consistency |
@@ -67,7 +67,7 @@ Initial audit: 2026-09-29; production follow-up: 2026-10-03 (Asia/Colombo). **Lo
 | 36 README | PASS | All requested sections and reproducible commands |
 | 37 Demo users | PASS | Fictional example.test accounts and bcrypt hashes |
 | 38 Response consistency | PASS | Collections data/meta/links; resources and login data; errors error |
-| 39 Route audit | PASS | See report/ROUTE-AUDIT.md and generated OpenAPI |
+| 39 Route audit | PASS | See report/archive/ROUTE-AUDIT.md and generated OpenAPI |
 | 40 Richardson | PASS | Level 2, no invented HATEOAS requirement |
 | 41 Rubric audit | PASS | This document |
 | 42 Honest claims | PASS | Verified local results distinguished from hosted blockers |
@@ -79,7 +79,7 @@ Initial audit: 2026-09-29; production follow-up: 2026-10-03 (Asia/Colombo). **Lo
 
 ## Limits and blockers
 
-Production deployment and Atlas connectivity verified on 2026-10-03. Live API: https://project-n8zne.vercel.app. Evidence: report/LIVE-DEPLOYMENT-VERIFICATION.json. A new protected Preview passed all 14 smoke groups through authenticated CLI requests on 2026-10-04 (Asia/Colombo). Only then was a new Production deployment created; all 14 public production smoke groups passed. See report/RELEASE-VERIFICATION.json, report/NEW-PREVIEW-SMOKE.json and report/NEW-PRODUCTION-SMOKE.json. Environment values were not recorded.
+Production deployment and Atlas connectivity verified on 2026-10-03. Live API: https://project-n8zne.vercel.app. Evidence: report/archive/LIVE-DEPLOYMENT-VERIFICATION.json. A new protected Preview passed all 14 smoke groups through authenticated CLI requests on 2026-10-04 (Asia/Colombo). Only then was a new Production deployment created; all 14 public production smoke groups passed. See report/archive/RELEASE-VERIFICATION.json, report/archive/NEW-PREVIEW-SMOKE.json and report/archive/NEW-PRODUCTION-SMOKE.json. Environment values were not recorded.
 
 At the initial audit, no Atlas URI, Vercel authentication/project or Git repository was present. The user subsequently configured Atlas and GitHub; the project is now connected and deployed through the authenticated Vercel dashboard. MongoDB integration **was** runtime-tested using a real disposable local mongod; it would be inaccurate to say no MongoDB connection was available. Official mongoexport/mongoimport binaries were absent; the shipped Node exporter and a driver-based import were exercised instead.
 

@@ -16,14 +16,15 @@ const authenticate = asyncHandler(async (req, res, next) => {
   let payload;
   try {
     payload = jwt.verify(token, jwtSecret, { algorithms: ['HS256'] });
-    if (!isObjectId(payload.sub)) throw new Error('Invalid subject');
+    if (!isObjectId(payload.sub) || !Number.isInteger(payload.exp) || !Number.isInteger(payload.iat) || payload.exp <= payload.iat || payload.iat > Date.now() / 1000 + 60 || typeof payload.role !== 'string' || !Array.isArray(payload.scopes) || !payload.scopes.length || payload.scopes.some(s => typeof s !== 'string') || payload.scope !== payload.scopes[0]) throw new Error('Invalid claims');
   } catch {
     return sendError(res, 401, 'INVALID_TOKEN', 'The bearer token is invalid or expired', null);
   }
   const user = await User.findById(payload.sub);
-  if (!user || !user.active || (user.role === 'device' && payload.installationId !== idString(user.installation))) {
+  if (!user || !user.active || payload.role !== user.role || JSON.stringify([...payload.scopes].sort()) !== JSON.stringify([...user.scopes].sort()) || (user.role === 'device' && payload.installationId !== idString(user.installation))) {
     return sendError(res, 401, 'INVALID_TOKEN', 'Token subject is inactive, invalid or reassigned', null);
   }
+  if ((user.scope === 'province' && payload.provinceId !== idString(user.province)) || (user.scope === 'district' && payload.districtId !== idString(user.district))) return sendError(res, 401, 'INVALID_TOKEN', 'Token jurisdiction has changed', null);
   req.user = user;
   req.tokenPayload = payload;
   return next();

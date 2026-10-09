@@ -75,3 +75,6 @@ I can explain the code I am submitting and I take responsibility for it.
 - Retain the user's exact prompts for these sessions alongside the original master prompt. This summary is not a complete prompt archive.
 - Official-document review identified an unresolved CRUD versus append-only conflict. Do not describe CRUD as complete without an authoritative resolution.
 - Student-authored report prose, personal tests, declaration signature, and viva understanding remain for the student to complete truthfully.
+
+- 2026-10-09: five-issues engineering audit and remediation, isolated tests, protected Preview and public Production verification, Atlas preservation and secret checks. See `FIVE-ISSUES-REMEDIATION.md` and `TEST-RESULTS.md`; retain the exact prompt and distinguish AI-run checks from your own.
+- 2026-10-10: AI-assisted report audit and file reorganization. Preserve this request and disclose any use of its summaries in the submitted materials.

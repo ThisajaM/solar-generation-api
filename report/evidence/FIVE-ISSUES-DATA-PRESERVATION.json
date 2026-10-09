@@ -1,0 +1,14 @@
+{
+  "verifiedAt": "2026-10-09T17:31:55.097Z",
+  "allSixCollectionDigestsUnchanged": true,
+  "readingIndexesUnchanged": true,
+  "counts": {
+    "provinces": 9,
+    "districts": 25,
+    "substations": 27,
+    "solarinstallations": 200,
+    "generationreadings": 134400,
+    "users": 227
+  },
+  "scope": "Read-only sequential BSON digests, not a database-wide transactional snapshot"
+}

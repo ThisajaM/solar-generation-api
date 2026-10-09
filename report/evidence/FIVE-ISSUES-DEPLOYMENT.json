@@ -1,0 +1,37 @@
+{
+  "verifiedAt": "2026-10-09T17:26:08.709Z",
+  "status": "ok",
+  "preview": {
+    "id": "dpl_ug1TXMJ216BxFhUtAfJBfddXNgeQ",
+    "url": "https://slsea-solar-generation-f9t69o86m-thisajams-projects.vercel.app",
+    "readyState": "READY",
+    "target": null,
+    "inspectorUrl": "https://vercel.com/thisajams-projects/slsea-solar-generation-api/ug1TXMJ216BxFhUtAfJBfddXNgeQ"
+  },
+  "previewSmokeGroups": {
+    "passed": 17,
+    "failed": 0,
+    "total": 17
+  },
+  "production": {
+    "id": "dpl_2wQEX9c6VHZxApMCiR5kdv5RtxVe",
+    "url": "https://slsea-solar-generation-29d6ferwb-thisajams-projects.vercel.app",
+    "productionUrl": "https://project-n8zne.vercel.app",
+    "readyState": "READY",
+    "target": "production",
+    "inspectorUrl": "https://vercel.com/thisajams-projects/slsea-solar-generation-api/2wQEX9c6VHZxApMCiR5kdv5RtxVe",
+    "verifiedAt": "2026-10-09T18:02:59.214Z",
+    "smokeGroupsPassed": 17,
+    "smokeGroupsFailed": 0,
+    "atlasCollectionsUnchanged": true
+  },
+  "dataPreserved": true,
+  "productionPreflight": {
+    "testsPassed": 120,
+    "lintPassed": true,
+    "openapiValid": true,
+    "sourceMatchesPreview": true,
+    "privateUploadFiles": 0,
+    "requiresMigrationOrReseed": false
+  }
+}

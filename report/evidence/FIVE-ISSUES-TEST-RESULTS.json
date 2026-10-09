@@ -1,0 +1,29 @@
+{
+  "verifiedAt": "2026-10-09T17:26:28.539Z",
+  "command": "npm test -- --runInBand",
+  "suites": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4
+  },
+  "tests": {
+    "passed": 120,
+    "failed": 0,
+    "skipped": 0,
+    "total": 120
+  },
+  "durationSeconds": 19.864,
+  "lint": "passed",
+  "openapiValidation": "passed",
+  "gitDiffWhitespace": "passed",
+  "database": "Disposable local MongoDB only; full-size seed and export/import test included",
+  "productionRuntimeStartup": "passed in isolated seed suite; Node production mode",
+  "preProductionRerun": {
+    "testsPassed": 120,
+    "testsFailed": 0,
+    "suitesPassed": 4,
+    "seconds": 19.396,
+    "lint": "passed",
+    "openapiValidation": "passed"
+  }
+}

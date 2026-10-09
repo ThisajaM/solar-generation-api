@@ -56,13 +56,14 @@ app.use('/api/v1', (req, res, next) => {
   }
   const collection = /\/(provinces|districts|substations|installations|readings)$/.test(req.path);
   const allowed = collection ? ['page', 'limit'] : [];
-  if (req.path.endsWith('/readings')) allowed.push('provinceId', 'districtId', 'substationId', 'from', 'to', 'sort');
+  if (req.path.endsWith('/readings')) allowed.push('provinceId', 'districtId', 'substationId', 'from', 'to', 'sort', 'pagination', 'cursor');
   if (['/districts', '/substations', '/installations'].includes(req.path)) allowed.push('provinceId');
   if (['/substations', '/installations'].includes(req.path)) allowed.push('districtId');
   if (req.path === '/installations') allowed.push('substationId');
   for (const [key, value] of Object.entries(req.query)) {
     if (!allowed.includes(key) || typeof value !== 'string') return sendError(res, 400, 'INVALID_PARAMETER', 'Unknown or repeated query parameter', { field: key });
   }
+  if ((req.query.pagination !== undefined && !['offset', 'cursor'].includes(req.query.pagination)) || (req.query.cursor !== undefined && (req.query.pagination !== 'cursor' || !req.query.cursor))) return sendError(res, 400, 'INVALID_PARAMETER', 'Invalid pagination mode or cursor combination', null);
   next();
 });
 

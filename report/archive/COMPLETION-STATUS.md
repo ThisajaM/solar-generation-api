@@ -4,7 +4,7 @@ Follow-up: 2026-10-04, Asia/Colombo. This is a technical handover, not the stude
 
 ## Outcome
 
-The new protected Preview passed all 14 smoke groups using authenticated Vercel CLI requests. Only after that success was a new Production deployment created. All 14 public production smoke groups then passed. See RELEASE-VERIFICATION.json for deployment identifiers and NEW-PREVIEW-SMOKE.json / NEW-PRODUCTION-SMOKE.json for check results. The CLI targets the existing coursework project explicitly by ID.
+The new protected Preview passed all 14 smoke groups using authenticated Vercel CLI requests. Only after that success was a new Production deployment created. All 14 public production smoke groups then passed. See ../archive/RELEASE-VERIFICATION.json for deployment identifiers and ../archive/NEW-PREVIEW-SMOKE.json / ../archive/NEW-PRODUCTION-SMOKE.json for check results. The CLI targets the existing coursework project explicitly by ID.
 
 Full assessment completion also remains blocked on the official CRUD ambiguity and personal submission requirements. Passing technical tests does not establish eligibility or guarantee marks.
 
@@ -19,7 +19,7 @@ Full assessment completion also remains blocked on the official CRUD ambiguity a
 - District generation summary stretch capability, with documented staleness and cumulative-energy limitations.
 - Public HTTPS production API and Swagger; deliberately Richardson Level 2.
 
-The detailed 8-dimension comparison, requirement sources and evidence remain in `OFFICIAL-ASSESSMENT-AUDIT.md`. It flags missing update/delete instead of labeling append-only create/read as full CRUD.
+The detailed 8-dimension comparison, requirement sources and evidence remain in `../OFFICIAL-ASSESSMENT-AUDIT.md`. It flags missing update/delete instead of labeling append-only create/read as full CRUD.
 
 ## Changes made in this follow-up
 
@@ -43,13 +43,13 @@ The local application's configured Atlas connection succeeded. The intended `npm
 | generationreadings | 134400 |
 | users | 227 |
 
-All 200 installations have 672 readings. User distribution: 200 devices, 25 district analysts, 1 province analyst and 1 national analyst. Evidence: `ATLAS-SEED-VERIFICATION.json`. Subsequent smoke checks confirm readings remain exactly 134400. Smoke tests did not add or remove records.
+All 200 installations have 672 readings. User distribution: 200 devices, 25 district analysts, 1 province analyst and 1 national analyst. Evidence: `../evidence/ATLAS-SEED-VERIFICATION.json`. Subsequent smoke checks confirm readings remain exactly 134400. Smoke tests did not add or remove records.
 
 ## Automated tests and API verification
 
-The complete Jest suite passed 82 tests in 3 suites after removing password output. A final rerun after the remaining output-hardening change is recorded in `FINAL-TEST-VERIFICATION.json`. ESLint and formal OpenAPI/reference validation passed, and `git diff --check` passed.
+The complete Jest suite passed 82 tests in 3 suites after removing password output. A final rerun after the remaining output-hardening change is recorded in `../archive/FINAL-TEST-VERIFICATION.json`. ESLint and formal OpenAPI/reference validation passed, and `git diff --check` passed.
 
-The current local application was started on a temporary loopback port against Atlas. All 14 smoke groups passed (`LOCAL-ATLAS-VERIFICATION.json`). The same 14 groups passed against the existing public production deployment (`PRODUCTION-RECHECK.json`):
+The current local application was started on a temporary loopback port against Atlas. All 14 smoke groups passed (`../evidence/LOCAL-ATLAS-VERIFICATION.json`). The same 14 groups passed against the existing public production deployment (`../archive/PRODUCTION-RECHECK.json`):
 
 1. Health 200 and database connected.
 2. Swagger HTML/JavaScript and OpenAPI load.
@@ -70,7 +70,7 @@ Successful POST creation is proved by the isolated automated suite, not by addin
 
 ## Secret and environment verification
 
-`.env` and `.vercel/` are ignored and untracked. A reachable-history scan inspected the current commit and found no matches for the configured Atlas URI, JWT secret, or the selected high-confidence private-key/token patterns. `SECRET-SCAN.json` records scope and limitations without values. Synthetic coursework fixture credentials and test-only keys already exist in seed/tests; they must not be reused for real systems. Pattern scanning is not a guarantee that every possible credential format is detected.
+`.env` and `.vercel/` are ignored and untracked. A reachable-history scan inspected the current commit and found no matches for the configured Atlas URI, JWT secret, or the selected high-confidence private-key/token patterns. `../archive/SECRET-SCAN.json` records scope and limitations without values. Synthetic coursework fixture credentials and test-only keys already exist in seed/tests; they must not be reused for real systems. Pattern scanning is not a guarantee that every possible credential format is detected.
 
 Production database health and authenticated requests show database/signing configuration functions. CORS behavior is tested without printing configuration values. Environment values were not retrieved from Vercel, printed, placed in reports or included in screenshots. This run does not claim an exact-value comparison of deployed secrets.
 
@@ -80,7 +80,7 @@ Production database health and authenticated requests show database/signing conf
 - Existing public production: https://project-n8zne.vercel.app
 - Public Swagger: https://project-n8zne.vercel.app/docs/
 - Existing Preview: https://slsea-solar-generation-bh5ldbe4g-thisajams-projects.vercel.app
-- Prior Preview evidence: Ready build; signed-in Swagger, health 200 and missing-bearer 401. Extended public requests redirect to Vercel sign-in. See `PREVIEW-DEPLOYMENT-VERIFICATION.json`.
+- Prior Preview evidence: Ready build; signed-in Swagger, health 200 and missing-bearer 401. Extended public requests redirect to Vercel sign-in. See `../archive/PREVIEW-DEPLOYMENT-VERIFICATION.json`.
 - CLI 62.2.0 authentication now succeeds. Link was refreshed; deployment commands explicitly selected the known existing project ID. Credentials were never printed.
 - New Preview: https://slsea-solar-generation-4zqn5temt-thisajams-projects.vercel.app — READY; all 14 smoke groups passed through authenticated CLI requests. Protection remains enabled.
 - New Production: https://slsea-solar-generation-386mfztqq-thisajams-projects.vercel.app — READY; public alias remains https://project-n8zne.vercel.app. All 14 public smoke groups passed.

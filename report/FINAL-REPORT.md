@@ -2,22 +2,24 @@
 
 > This AI-assisted engineering log is not the student-authored assessed report. The official-document review in OFFICIAL-ASSESSMENT-AUDIT.md supersedes earlier blanket compliance statements. The brief requires a 2250-2750-word student justification and prohibits AI-generated report prose.
 
-Initial report: 2026-09-29; deployment follow-up: 2026-10-03 (Asia/Colombo). Production deployment and Atlas connectivity verified on 2026-10-03. Live API: https://project-n8zne.vercel.app. Evidence: report/LIVE-DEPLOYMENT-VERIFICATION.json. A new protected Preview passed all 14 smoke groups through authenticated CLI requests on 2026-10-04 (Asia/Colombo). Only then was a new Production deployment created; all 14 public production smoke groups passed. See report/RELEASE-VERIFICATION.json, report/NEW-PREVIEW-SMOKE.json and report/NEW-PRODUCTION-SMOKE.json. Environment values were not recorded.
+**Later engineering update (2026-10-09):** The five-issues remediation added verified freshness, energy-quality, cursor, and authentication fixes. Its recorded isolated run passed 120 tests, and protected Preview and public Production each passed 17 smoke groups. See [FIVE-ISSUES-REMEDIATION.md](FIVE-ISSUES-REMEDIATION.md) and [TEST-RESULTS.md](TEST-RESULTS.md). The 82-test and 14-group figures below are dated earlier evidence. Full CRUD and personal submission requirements remain unresolved.
+
+Initial report: 2026-09-29; deployment follow-up: 2026-10-03 (Asia/Colombo). Production deployment and Atlas connectivity verified on 2026-10-03. Live API: https://project-n8zne.vercel.app. Evidence: archive/LIVE-DEPLOYMENT-VERIFICATION.json. A new protected Preview passed all 14 smoke groups through authenticated CLI requests on 2026-10-04 (Asia/Colombo). Only then was a new Production deployment created; all 14 public production smoke groups passed. See archive/RELEASE-VERIFICATION.json, archive/NEW-PREVIEW-SMOKE.json and archive/NEW-PRODUCTION-SMOKE.json. Environment values were not recorded.
 
 ## 1. Overall status
 
 **VERIFIED:** Express/Mongoose API, all six required entities, append-only readings, scoped JWT access, hierarchical and top-level reads, pagination/filtering/sorting, HTTP validators, summary calculations, full-size seed, BSON-preserving export/import, Swagger document/assets, and production-mode local HTTP startup.
 
-**LIVE VERIFIED (2026-10-03):** Production build, Atlas health, Swagger HTML/JS, JWT login for all four demo roles, scoped reads, 134,400 readings and conditional HTTP behavior. **NOT VERIFIED:** official MongoDB Database Tools command execution. The subsequent protected Preview and public Production each passed all 14 smoke groups; see RELEASE-VERIFICATION.json.
+**LIVE VERIFIED (2026-10-03):** Production build, Atlas health, Swagger HTML/JS, JWT login for all four demo roles, scoped reads, 134,400 readings and conditional HTTP behavior. **NOT VERIFIED:** official MongoDB Database Tools command execution. The subsequent protected Preview and public Production each passed all 14 smoke groups; see archive/RELEASE-VERIFICATION.json.
 
 ## 2. Files created
 
 - `package-lock.json`: reproducible dependency resolution.
 - `COURSEWORK-AUDIT.md`: rubric and all 47 prompt-section mappings.
-- `report/INITIAL-AUDIT.md`: issues identified before implementation.
-- `report/FINAL-REPORT.md`: this report.
-- `report/ROUTE-AUDIT.md`: per-endpoint HTTP/security review.
-- `report/TEST-RESULTS.md`: actual validation outcomes and limitations.
+- `archive/INITIAL-AUDIT.md`: issues identified before implementation.
+- `FINAL-REPORT.md`: this report.
+- `archive/ROUTE-AUDIT.md`: per-endpoint HTTP/security review.
+- `TEST-RESULTS.md`: actual validation outcomes and limitations.
 - `src/services/collectionService.js`: scoped top-level queries and consistent collection envelopes.
 - `scripts/create-indexes.js`: non-destructive index creation after import.
 - `scripts/validate-openapi.js`: formal specification validation.
@@ -35,7 +37,7 @@ Initial report: 2026-09-29; deployment follow-up: 2026-10-03 (Asia/Colombo). Pro
 - `src/routes/geography.js`, `src/routes/readings.js`.
 - `src/controllers/authController.js`, `src/controllers/geographyController.js`, `src/controllers/readingController.js`, `src/controllers/summaryController.js`.
 - `src/services/authService.js`, `src/services/readingService.js`, `src/services/summaryService.js`.
-- `src/docs/openapi.js`, `src/docs/README.md`, `tests/api.test.js`, `report/AI-DISCLOSURE-TEMPLATE.md`.
+- `src/docs/openapi.js`, `src/docs/README.md`, `tests/api.test.js`, `AI-DISCLOSURE-TEMPLATE.md`.
 
 Correct existing models, hierarchy services, utilities, route/controller separation and Vercel export entry were retained. There was no Git repository in this directory; no commits/history were created or fabricated.
 
@@ -91,7 +93,7 @@ Authenticated GET under `/api/v1`:
 - `/installations/:installationId/last-reading`, `/installations/:installationId/readings`, `/installations/:installationId/readings/:readingId`.
 - `/readings`.
 
-Device POST: `/api/v1/installations/:installationId/readings`. Returns 201, Location and `{data: reading}`. Readings cannot be overwritten or deleted through HTTP. See ROUTE-AUDIT.md for each endpoint's semantics.
+Device POST: `/api/v1/installations/:installationId/readings`. Returns 201, Location and `{data: reading}`. Readings cannot be overwritten or deleted through HTTP. See archive/ROUTE-AUDIT.md for each endpoint's semantics.
 
 ## 8. Authentication
 
@@ -121,7 +123,7 @@ Use Node 22.x. Run `npm install`, copy `.env.example` to `.env`, set MONGODB_URI
 
 Authenticate/link with `npx vercel login` and `npx vercel link`, or import a real Git repository in Vercel. Use Node 22.x and Other preset; retain supplied vercel.json. Add MONGODB_URI, JWT_SECRET, JWT_EXPIRES_IN and CORS_ORIGIN for Preview/Production. Deploy a preview, verify `/health`, docs assets, login and scoped reads/ingestion, then deploy production. Seed Atlas separately from a trusted local process. The exported function requires no listener and caches the MongoDB connection.
 
-Production deployment succeeded on 2026-10-03 from commit 62f733a; see LIVE-DEPLOYMENT-VERIFICATION.json.
+Production deployment succeeded on 2026-10-03 from commit 62f733a; see archive/LIVE-DEPLOYMENT-VERIFICATION.json.
 
 ## 16. Environment variables
 
@@ -133,7 +135,7 @@ See TEST-RESULTS.md for actual final counts and commands. Verification includes 
 
 ## 19. Unresolved issues and practical limits
 
-- New Preview and Production deployments each passed 14 smoke groups, with authenticated CLI access used for protected Preview. See RELEASE-VERIFICATION.json.
+- New Preview and Production deployments each passed 14 smoke groups, with authenticated CLI access used for protected Preview. See archive/RELEASE-VERIFICATION.json.
 - Official mongoexport/mongoimport executable behavior was not tested; equivalent Node exporter/driver round trip was.
 - Summary daily energy cannot reconstruct meter resets or missing intervals; stale last-known power is explicitly documented.
 - Process-local rate limiting is suitable for coursework, not a global distributed quota.

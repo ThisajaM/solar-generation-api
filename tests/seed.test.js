@@ -98,5 +98,11 @@ test('full seed, referential integrity, realistic intervals, BSON export/import 
   const response = await fetch(`${base}/api/v1/readings?limit=1`, { headers: { Authorization: `Bearer ${token}` } });
   expect(response.status).toBe(200);
   expect((await response.json()).meta.total).toBe(134400);
+  const cursorResponse = await fetch(`${base}/api/v1/readings?pagination=cursor&limit=100&sort=timestamp`, { headers: { Authorization: `Bearer ${token}` } });
+  expect(cursorResponse.status).toBe(200);
+  const first = await cursorResponse.json(); expect(first.meta.total).toBe(134400); expect(first.data).toHaveLength(100);
+  const second = await (await fetch(base + first.links.next, { headers: { Authorization: `Bearer ${token}` } })).json();
+  expect(new Set([...first.data, ...second.data].map(r => r.id)).size).toBe(200);
+  expect(second.meta.consistency).toBe('live-keyset');
   expect((await fetch(`${base}/docs/swagger-ui-bundle.js`)).status).toBe(200);
 }, 180000);

@@ -1,0 +1,18 @@
+{
+  "verifiedAt": "2026-10-09T18:02:26.433Z",
+  "previewReadyBeforeSourceComparison": true,
+  "sourceSetMatchesPreviewPreflight": true,
+  "changedSincePrePreviewDryRun": [
+    "scripts/smoke.js",
+    "src/utils/readingQuality.js"
+  ],
+  "changedAfterSuccessfulPreview": [],
+  "sourceMatchesTestedPreview": true,
+  "productionUploadFiles": 55,
+  "privateUploadFiles": 0,
+  "trackedPrivateFiles": 0,
+  "schemaIndexSeedChangesRequired": false,
+  "testsPassed": 120,
+  "lintPassed": true,
+  "openapiValid": true
+}

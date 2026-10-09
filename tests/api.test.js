@@ -275,7 +275,9 @@ describe('district summary', () => {
     const res = await request(app).get(`/api/v1/districts/${ids.colombo}/generation-summary`).set(auth(tokens.national));
     expect(res.status).toBe(200);
     expect(res.body.data.summary.installationCount).toBe(1);
-    expect(res.body.data.summary.currentPowerKw).toBeGreaterThan(0);
+    expect(res.body.data.summary.currentPowerKw).toBe(0);
+    expect(res.body.data.summary.lastKnownPowerKw).toBeGreaterThan(0);
+    expect(res.body.data.summary.powerQuality.staleInstallations).toBe(1);
   });
 
   test('district analyst cannot summarise Batticaloa', async () => {
@@ -435,9 +437,12 @@ describe('regressions and security boundaries', () => {
     expect(unauthenticated.status).toBe(401);
     expect(unauthenticated.headers['access-control-allow-origin']).toBe('*');
   });
-  test('summary uses midnight baseline, ignores future data and has stable ETag', async () => {
+  test('summary excludes stale power and cross-midnight energy, ignores future data and has stable ETag', async () => {
     const { startOfColomboDay } = require('../src/utils/sriLankaTime');
     const start = startOfColomboDay(new Date());
+    const RealDate = Date;
+    global.Date = class extends RealDate { constructor(...args) { super(...(args.length ? args : [+start + 7200000])); } };
+    try {
     await GenerationReading.insertMany([
       { installation: ids.instA, timestamp: new Date(start.getTime() - 900000), powerKw: 0, cumulativeEnergyKwh: 200, voltage: 230 },
       { installation: ids.instA, timestamp: new Date(start.getTime() + 1), powerKw: 2, cumulativeEnergyKwh: 210, voltage: 230 },
@@ -445,10 +450,13 @@ describe('regressions and security boundaries', () => {
     ]);
     const path = `/api/v1/districts/${ids.colombo}/generation-summary`;
     const first = await request(app).get(path).set(auth(tokens.district));
-    expect(first.body.data.summary.currentPowerKw).toBe(2);
-    expect(first.body.data.summary.todayEnergyKwh).toBe(10);
+    expect(first.body.data.summary.currentPowerKw).toBe(0);
+    expect(first.body.data.summary.lastKnownPowerKw).toBe(2);
+    expect(first.body.data.summary.todayEnergyKwh).toBe(0);
+    expect(first.body.data.summary.energyQuality.reasons).toContain('missing-midnight-baseline');
     const second = await request(app).get(path).set(auth(tokens.district)).set('If-None-Match', first.headers.etag);
     expect(second.status).toBe(304);
+    } finally { global.Date = RealDate; }
   });
   test('OpenAPI has concrete successful JSON schemas and no historical mutations', async () => {
     const res = await request(app).get('/openapi.json');
@@ -466,5 +474,98 @@ describe('regressions and security boundaries', () => {
     for (const asset of ['swagger-ui.css', 'swagger-ui-bundle.js', 'swagger-ui-init.js']) {
       expect((await request(app).get(`/docs/${asset}`)).status).toBe(200);
     }
+  });
+});
+
+
+describe('five-issue regressions', () => {
+  test('district energy uses per-installation deltas and fresh/stale/missing coverage', async () => {
+    const district = await District.create({ name: 'Isolated quality district', code: 'QUALITY', province: ids.wp });
+    const station = await Substation.create({ name: 'Quality station', code: 'QUALITY', district: district._id });
+    const installations = await SolarInstallation.insertMany([0, 1, 2].map(n => ({ name: `Quality ${n}`, code: `QUALITY-${n}`, meterId: `QUALITY-${n}`, capacityKw: 10, latitude: 7, longitude: 80, substation: station._id })));
+    const start = +new Date('2035-01-01T18:30:00Z');
+    const records = [[0, 100], [15, 102], [30, 0], [45, 3], [60, 4]].map(([minute, counter]) => ({ installation: installations[0]._id, timestamp: new Date(start + minute * 60000), cumulativeEnergyKwh: counter, powerKw: 4, voltage: 230 }));
+    records.push(...[[0, 200], [15, 203]].map(([minute, counter]) => ({ installation: installations[1]._id, timestamp: new Date(start + minute * 60000), cumulativeEnergyKwh: counter, powerKw: 6, voltage: 230 })));
+    await GenerationReading.insertMany(records);
+    const { districtSummary } = require('../src/services/summaryService');
+    const { summary } = await districtSummary(district._id, new Date(start + 60 * 60000));
+    expect(summary.currentPowerKw).toBe(4); expect(summary.lastKnownPowerKw).toBe(10);
+    expect(summary.todayEnergyKwh).toBe(9); // (2 + 3 + 1) + 3; reset interval excluded.
+    expect(summary.powerQuality).toEqual({ freshInstallations: 1, staleInstallations: 1, missingInstallations: 1 });
+    expect(summary.energyQuality.partialInstallations).toBe(3); expect(summary.energyQuality.counterDecreases).toBe(1);
+    expect(summary.window.from).toBe('2035-01-01T18:30:00.000Z');
+    const missing = await request(app).get(`/api/v1/installations/${installations[2]._id}/last-reading`).set(auth(tokens.national));
+    expect(missing.status).toBe(404); expect(missing.body.error.detail.status).toBe('missing');
+  });
+
+  test.each(['timestamp', '-timestamp'])('keyset traversal survives concurrent inserts (%s)', async sort => {
+    const baseTime = sort === 'timestamp' ? '2031-01-01T00:00:00Z' : '2032-01-01T00:00:00Z';
+    const begin = +new Date(baseTime);
+    const rows = await GenerationReading.insertMany([0, 1, 2, 3, 4, 5].map((n) => ({ installation: n % 2 ? ids.instA : ids.instB, timestamp: new Date(begin + Math.floor(n / 2) * 900000), powerKw: 1, cumulativeEnergyKwh: n, voltage: 230 })));
+    const path = `/api/v1/readings?pagination=cursor&limit=2&sort=${sort}&from=${baseTime}&to=${new Date(begin + 3600000).toISOString()}`;
+    const first = await request(app).get(path).set(auth(tokens.national));
+    expect(first.status).toBe(200); expect(first.body.meta.total).toBe(6); expect(first.body.links.previous).toBeNull();
+    await GenerationReading.create({ installation: ids.instA, timestamp: new Date(begin + 1000), powerKw: 1, cumulativeEnergyKwh: 1, voltage: 230 });
+    await GenerationReading.create({ installation: ids.instA, timestamp: new Date(begin + 3599000), powerKw: 1, cumulativeEnergyKwh: 10, voltage: 230 });
+    const seen = first.body.data.map(r => r.id); let next = first.body.links.next; let previous;
+    while (next) {
+      const response = await request(app).get(next).set(auth(tokens.national)); expect(response.status).toBe(200);
+      seen.push(...response.body.data.map(r => r.id)); previous = response.body.links.previous; next = response.body.links.next;
+    }
+    expect(new Set(seen).size).toBe(seen.length);
+    for (const row of rows) expect(seen).toContain(String(row._id));
+    expect(previous).toBeTruthy();
+    const back = await request(app).get(previous).set(auth(tokens.national)); expect(back.status).toBe(200); expect(back.body.links.next).toBeTruthy();
+    expect((await request(app).get(first.body.links.next + '&districtId=' + ids.colombo).set(auth(tokens.national))).status).toBe(400);
+    expect((await request(app).get(first.body.links.next).set(auth(tokens.district))).status).toBe(400);
+    const changed = new URL(first.body.links.next, 'http://local'); changed.searchParams.set('cursor', changed.searchParams.get('cursor') + 'x');
+    expect((await request(app).get(changed.pathname + changed.search).set(auth(tokens.national))).status).toBe(400);
+  });
+  test('nested cursor boundaries, reverse navigation, invalid modes and empty history', async () => {
+    const path = `/api/v1/installations/${ids.instA}/readings?pagination=cursor&limit=2&sort=timestamp`;
+    const first = await request(app).get(path).set(auth(tokens.deviceA)); expect(first.status).toBe(200);
+    const second = await request(app).get(first.body.links.next).set(auth(tokens.deviceA)); expect(second.status).toBe(200);
+    const back = await request(app).get(second.body.links.previous).set(auth(tokens.deviceA));
+    expect(back.body.data.map(r => r.id)).toEqual(first.body.data.map(r => r.id));
+    expect((await request(app).get(first.body.links.next).set(auth(tokens.deviceB))).status).toBe(403);
+    for (const suffix of ['&cursor=bad', '&page=1', '&pagination=other']) expect((await request(app).get(path + suffix).set(auth(tokens.deviceA))).status).toBe(400);
+    const empty = await request(app).get(path + '&from=2199-01-01T00:00:00Z').set(auth(tokens.deviceA));
+    expect(empty.body.data).toEqual([]); expect(empty.body.links.next).toBeNull(); expect(empty.body.links.previous).toBeNull();
+  });
+  test('freshness changes invalidate cached operational representations', async () => {
+    const { freshnessSeconds } = require('../src/config/env');
+    const original = Date.now();
+    const reading = await GenerationReading.create({ installation: ids.instB, timestamp: new Date('2040-01-01T00:00:00Z'), powerKw: 1, cumulativeEnergyKwh: 1, voltage: 230 });
+    // Service receives trusted server time; move only the Date constructor for GET evaluation.
+    const NativeDate = Date;
+    const path = `/api/v1/installations/${ids.instB}/last-reading`;
+    global.Date = class extends NativeDate { constructor(...args) { super(...(args.length ? args : [+reading.timestamp])); } static now() { return original; } };
+    try {
+      const first = await request(app).get(path).set(auth(tokens.national)); expect(first.body.freshness.status).toBe('fresh');
+      global.Date = class extends NativeDate { constructor(...args) { super(...(args.length ? args : [+reading.timestamp + (freshnessSeconds + 1) * 1000])); } static now() { return original; } };
+      const stale = await request(app).get(path).set(auth(tokens.national)).set('If-None-Match', first.headers.etag);
+      expect(stale.status).toBe(200); expect(stale.body.freshness.status).toBe('stale'); expect(stale.headers['last-modified']).toBeUndefined();
+    } finally { global.Date = NativeDate; }
+  });
+  test.each(['exp', 'iat', 'sub', 'role', 'scopes', 'scope', 'installationId'])('device JWT requires %s', async claim => {
+    const jwt = require('jsonwebtoken'); const { jwtSecret } = require('../src/config/env');
+    const payload = jwt.decode(tokens.deviceA); delete payload[claim];
+    const token = jwt.sign(payload, jwtSecret, { algorithm: 'HS256', noTimestamp: claim === 'iat' });
+    expect((await request(app).get(`/api/v1/installations/${ids.instA}`).set(auth(token))).status).toBe(401);
+  });
+  test.each(['role', 'scopes', 'scope', 'installationId'])('device claim escalation rejected: %s', async claim => {
+    const jwt = require('jsonwebtoken'); const { jwtSecret } = require('../src/config/env'); const payload = jwt.decode(tokens.deviceA);
+    payload[claim] = claim === 'scopes' ? ['analyst-read'] : claim === 'installationId' ? ids.instB : 'national-analyst';
+    const token = jwt.sign(payload, jwtSecret);
+    expect((await request(app).get(`/api/v1/installations/${ids.instA}`).set(auth(token))).status).toBe(401);
+  });
+  test('forged, wrong algorithm and disabled device tokens are rejected', async () => {
+    const jwt = require('jsonwebtoken'); const { jwtSecret } = require('../src/config/env'); const payload = jwt.decode(tokens.deviceA);
+    for (const token of [jwt.sign(payload, 'fictional-wrong-test-key'), jwt.sign(payload, jwtSecret, { algorithm: 'HS384' })]) {
+      expect((await request(app).get(`/api/v1/installations/${ids.instA}`).set(auth(token))).status).toBe(401);
+    }
+    await User.updateOne({ _id: payload.sub }, { active: false });
+    try { expect((await request(app).get(`/api/v1/installations/${ids.instA}`).set(auth(tokens.deviceA))).status).toBe(401); }
+    finally { await User.updateOne({ _id: payload.sub }, { active: true }); }
   });
 });

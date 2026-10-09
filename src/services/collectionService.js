@@ -1,3 +1,4 @@
+const { cursorPage } = require('./cursorService');
 const District = require('../models/District');
 const Substation = require('../models/Substation');
 const SolarInstallation = require('../models/SolarInstallation');
@@ -36,6 +37,7 @@ async function listCollection(req, kind) {
     const direction = parseSort(req.query.sort).startsWith('-') ? -1 : 1;
     sort = { timestamp: direction, _id: direction };
   }
+  if (kind === 'readings' && req.query.pagination === 'cursor') return cursorPage(req, model, query, limit, sort.timestamp);
   const total = await model.countDocuments(query);
   const data = await model.find(query).sort(sort).skip((page - 1) * limit).limit(limit);
   const pages = Math.ceil(total / limit);

@@ -1,3 +1,4 @@
+const { cursorPage } = require('./cursorService');
 const GenerationReading = require('../models/GenerationReading');
 const SolarInstallation = require('../models/SolarInstallation');
 const { parseIsoDate, parsePagination, parseSort, asNonNegativeNumber, validateOptionalObjectIdQuery } = require('../utils/validate');
@@ -57,6 +58,7 @@ async function listReadings(req, installation) {
     if (to) query.timestamp.$lte = to;
   }
 
+  if (req.query.pagination === 'cursor') return { payload: await cursorPage(req, GenerationReading, query, limit, sort.startsWith('-') ? -1 : 1) };
   const sortSpec = { timestamp: sort.startsWith('-') ? -1 : 1 };
   const total = await GenerationReading.countDocuments(query);
   const pages = total === 0 ? 0 : Math.ceil(total / limit);

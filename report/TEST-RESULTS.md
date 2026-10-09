@@ -1,4 +1,18 @@
-# Validation evidence — 2026-09-29
+# Validation evidence — 2026-09-29 through 2026-10-09
+
+## Latest verified remediation results — 2026-10-09
+
+The latest recorded isolated run passed **120/120 tests across four suites**, with no failures or skips. The pre-Production rerun also passed 120 tests. Lint, formal OpenAPI validation, and the Git whitespace check passed. The original machine-generated record is [FIVE-ISSUES-TEST-RESULTS.json](evidence/FIVE-ISSUES-TEST-RESULTS.json). These are recorded results from the remediation pass, not a claim that the suite was rerun during this documentation cleanup.
+
+The protected Preview and public Production each passed **17/17 smoke groups**. See the original [Preview](evidence/FIVE-ISSUES-PREVIEW-SMOKE.json) and [Production](evidence/FIVE-ISSUES-PRODUCTION-SMOKE.json) results, plus [deployment verification](evidence/FIVE-ISSUES-PRODUCTION-DEPLOYMENT.json). The smoke runner made no successful live reading writes. The [baseline](evidence/FIVE-ISSUES-ATLAS-BEFORE.json), [post-Preview](evidence/FIVE-ISSUES-ATLAS-AFTER.json), and [post-Production](evidence/FIVE-ISSUES-ATLAS-AFTER-PRODUCTION.json) records retain all six collection counts, digests, and reading index definitions. The [Production comparison](evidence/FIVE-ISSUES-PRODUCTION-DATA-PRESERVATION.json) reports them unchanged; these are sequential checks, not a transactional snapshot.
+
+The earlier 82-test and 14-group runs below remain dated historical results. Full CRUD is still unresolved because no update/delete resource exists. The student-authored assessment report, declaration, collaborator evidence, and personal verification remain outstanding as described in [OFFICIAL-ASSESSMENT-AUDIT.md](OFFICIAL-ASSESSMENT-AUDIT.md).
+
+The 2026-10-03/04 machine records and completion note are in `archive/`; they can be excluded from a compact submission package if the assessment permits, while retaining this repository archive. Preserve `evidence/` and the five primary reports with the submission.
+
+On 2026-10-10, after the report reorganization, the existing isolated suite was rerun with local socket access and passed **120/120 tests across four suites**. Lint, OpenAPI validation, `git diff --check`, JSON parsing, and report-reference checks also passed. No Atlas or Vercel checks were rerun as part of this documentation cleanup; their dated records remain the authority for those outcomes.
+
+## Historical validation — 2026-09-29 through 2026-10-04
 
 ## Final observed results
 
@@ -59,21 +73,21 @@ Not every infrastructure failure was injected: rate-limit/database-failure handl
 3. Lint caught missing braces while the OpenAPI document was being completed; corrected before runtime checks.
 4. The latest OpenAPI validator includes an ESM dependency that Jest 29's CommonJS loader cannot parse. The validation test now invokes the same validator using Node 22's native module loading; standalone and suite checks pass.
 
-No failed checks were silently skipped. Tests exit normally without Jest forceExit. Seed/import/production startup are genuine test executions; hosted deployment evidence was subsequently recorded in LIVE-DEPLOYMENT-VERIFICATION.json on 2026-10-03.
+No failed checks were silently skipped. Tests exit normally without Jest forceExit. Seed/import/production startup are genuine test executions; hosted deployment evidence was subsequently recorded in archive/LIVE-DEPLOYMENT-VERIFICATION.json on 2026-10-03.
 
 ## Live deployment follow-up — 2026-10-03
 
-Production deployment and Atlas connectivity verified on 2026-10-03. Live API: https://project-n8zne.vercel.app. Evidence: report/LIVE-DEPLOYMENT-VERIFICATION.json. A new protected Preview passed all 14 smoke groups through authenticated CLI requests on 2026-10-04 (Asia/Colombo). Only then was a new Production deployment created; all 14 public production smoke groups passed. See report/RELEASE-VERIFICATION.json, report/NEW-PREVIEW-SMOKE.json and report/NEW-PRODUCTION-SMOKE.json. Environment values were not recorded.
+Production deployment and Atlas connectivity verified on 2026-10-03. Live API: https://project-n8zne.vercel.app. Evidence: archive/LIVE-DEPLOYMENT-VERIFICATION.json. A new protected Preview passed all 14 smoke groups through authenticated CLI requests on 2026-10-04 (Asia/Colombo). Only then was a new Production deployment created; all 14 public production smoke groups passed. See archive/RELEASE-VERIFICATION.json, archive/NEW-PREVIEW-SMOKE.json and archive/NEW-PRODUCTION-SMOKE.json. Environment values were not recorded.
 
 Read-only HTTPS smoke checks passed; no new generation readings were inserted. All four demo roles authenticated. Collection counts matched, and scope, pagination, date filtering, ETag/304, If-Match/412, summary and CORS checks passed. The independently verified Atlas demo-user count remains 227 from the reseed verification. Official Database Tools remain untested.
 
 
 ## Final completion follow-up (2026-10-04)
 
-- Final `npm test`: 82 passed, 3 suites, 20.495 seconds; see FINAL-TEST-VERIFICATION.json.
+- Final `npm test`: 82 passed, 3 suites, 20.495 seconds; see archive/FINAL-TEST-VERIFICATION.json.
 - `npm run lint`, `npm run docs:validate`, and `git diff --check`: passed.
-- Dedicated Atlas reseed and independent exact-count check: passed; see ATLAS-SEED-VERIFICATION.json.
-- Local application against Atlas: 14 smoke groups passed; see LOCAL-ATLAS-VERIFICATION.json.
-- Existing public production after reseed: 14 smoke groups passed; see PRODUCTION-RECHECK.json.
-- New Preview and Production deployed in order: 14 smoke groups passed on each; see RELEASE-VERIFICATION.json. Preview protection was retained.
+- Dedicated Atlas reseed and independent exact-count check: passed; see evidence/ATLAS-SEED-VERIFICATION.json.
+- Local application against Atlas: 14 smoke groups passed; see evidence/LOCAL-ATLAS-VERIFICATION.json.
+- Existing public production after reseed: 14 smoke groups passed; see archive/PRODUCTION-RECHECK.json.
+- New Preview and Production deployed in order: 14 smoke groups passed on each; see archive/RELEASE-VERIFICATION.json. Preview protection was retained.
 - Update/delete CRUD: absent and unresolved against conflicting official requirements, not marked PASS.

@@ -19,7 +19,15 @@ function mongoUri() {
   return process.env.MONGODB_URI;
 }
 
+function positiveSeconds(name, fallback) {
+  const value = process.env[name] === undefined ? fallback : Number(process.env[name]);
+  if (!Number.isSafeInteger(value) || value <= 0) throw new Error(`Invalid ${name}`);
+  return value;
+}
+
 module.exports = {
+  freshnessSeconds: positiveSeconds('READING_FRESHNESS_SECONDS', 1800),
+  reportingIntervalSeconds: positiveSeconds('READING_INTERVAL_SECONDS', 900),
   nodeEnv: process.env.NODE_ENV || 'development',
   port: Number(process.env.PORT || 3000),
   mongoUri,

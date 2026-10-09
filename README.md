@@ -270,7 +270,17 @@ Typical statuses: 400 validation, 401 unauthenticated, 403 unauthorized, 404 mis
 
 ## District Summary
 
-`GET /api/v1/districts/:districtId/generation-summary` sums each installation's latest reading at or before the current time. Power is last-known rather than guaranteed simultaneous live power; `latestReadingAt` makes staleness visible. Daily energy is latest cumulative energy minus the last value at or before Colombo midnight, falling back to the first value today. Negative deltas are clamped to zero. Missing boundary readings and meter resets may undercount; no interpolation is fabricated. The window ends at exclusive next midnight. Aggregation uses MongoDB lookups backed by `(installation, timestamp)`.
+`GET /api/v1/districts/:districtId/generation-summary` includes only fresh non-future measurements in `currentPowerKw`; `lastKnownPowerKw` includes stale last-known values. `powerQuality` counts fresh/stale/missing installations. Last-reading keeps its `data` and adds `freshness`; composite adds `latestReadingFreshness`. Missing last-reading remains 404 with freshness in `error.detail`. Status is fresh, stale, missing, future or invalid. Age uses server UTC time and measurement timestamp, not receipt time. Exactly the freshness threshold remains fresh. Historical data is retained and delayed valid ingestion is accepted. Dynamic freshness uses ETag without Last-Modified.
+
+Daily `todayEnergyKwh` sums valid consecutive nonnegative cumulative counter deltas wholly inside the Asia/Colombo day. Intervals over `READING_INTERVAL_SECONDS` (default 900), counter decreases and cross-midnight intervals are excluded. The post-reset counter is never assumed to be energy generated since reset; subsequent valid increments are counted. Without an exact midnight baseline, calculation starts with the first in-day pair and is partial. No interpolation or rollover modulus is assumed. `energyQuality` reports partial installations, decreases, gaps and reasons. Complete-through-last-reading means observed coverage only, not a full-day forecast or proof of meter accuracy. An undetectable reset between samples remains a limitation.
+
+Optional `READING_FRESHNESS_SECONDS=1800` and `READING_INTERVAL_SECONDS=900` are positive integers in seconds; omission preserves these defaults. Set the freshness threshold according to the actual reporting schedule. Existing fixed seed history will normally be stale and may give zero observed energy today.
+
+Both historical collection routes accept `pagination=cursor&limit=50&sort=timestamp` (or `-timestamp`). Follow `links.next` and `links.previous` unchanged. Signed cursors expire in one hour and bind the original filters, limit, order, resource and authenticated principal/jurisdiction. Changed or malformed cursors return 400 `INVALID_CURSOR`; every page independently authorizes the user. Ordering is timestamp plus public reading ID. This avoids offset shifts for existing immutable records, but is **not snapshot isolation**: newly inserted rows behind the boundary are not revisited; rows ahead may appear. Totals are live counts. Cursor metadata omits page/pages and identifies `live-keyset`. Default offset pagination and its existing contract remain available. Existing indexes are unchanged; broad national queries and exact counts still incur work proportional to the filtered dataset.
+
+JWT validation restricts HS256 and requires subject, expiry, issued-at, role, scope and scopes; claims must match the active database user and device installation/analyst jurisdiction. Existing login-issued tokens remain compatible. No credential or secret was rotated. For credential rotation, disable the affected account first (immediately rejects its tokens), replace its bcrypt hash through a controlled administrative maintenance process, and wait until outstanding tokens expire before re-enabling. Merely changing a password does not revoke existing JWTs. Issuer/audience separation and shared rate-limit storage remain production-hardening work; the current app issues and accepts its own tokens with an exclusive signing secret. The process-local limiter cannot provide a global multi-instance Vercel limit.
+
+The brief permits device append-only writes and analyst reads but the rubric requests full CRUD. No unauthorized administrative role or mutable-history route has been added. Lecturer clarification is required before introducing installation management. See `report/FIVE-ISSUES-REMEDIATION.md`.
 
 ## Swagger
 
@@ -299,7 +309,9 @@ CLI alternative: `npx vercel login`, `npx vercel link`, configure the same envir
 
 The configuration follows [Vercel Node functions](https://vercel.com/docs/functions/runtimes/node-js) and [function file inclusion](https://vercel.com/docs/project-configuration/vercel-json). No persistent filesystem, background process or production `app.listen()` is required. MongoDB connections and in-flight connection promises are reused within each warm process.
 
-**Production deployment verified (2026-10-03).** [Live Swagger](https://project-n8zne.vercel.app/docs/) · [Health](https://project-n8zne.vercel.app/health). Atlas connectivity, Swagger assets, all four demo-role logins, jurisdiction enforcement, 134,400 readings, pagination, filters, conditional requests, summaries and CORS passed live checks. See `report/LIVE-DEPLOYMENT-VERIFICATION.json`. The production domain retains the initial generated project name. A new protected Preview passed all 14 smoke groups through authenticated CLI requests on 2026-10-04 (Asia/Colombo). Only then was a new Production deployment created; all 14 public production smoke groups passed. See report/RELEASE-VERIFICATION.json, report/NEW-PREVIEW-SMOKE.json and report/NEW-PRODUCTION-SMOKE.json. Environment values were not recorded.
+**Five-issues Production deployment verified (2026-10-09).** The Preview and authorized Production deployment each passed 17 smoke groups after 120 automated tests, lint and OpenAPI validation. All six Atlas collection counts and data digests remained unchanged. The current public API and Swagger are at [project-n8zne.vercel.app](https://project-n8zne.vercel.app/docs/); deployment `dpl_2wQEX9c6VHZxApMCiR5kdv5RtxVe`. Full CRUD remains unresolved pending lecturer clarification. See [remediation evidence](report/FIVE-ISSUES-REMEDIATION.md) and [consolidated test results](report/TEST-RESULTS.md).
+
+**Production deployment verified (2026-10-03).** [Live Swagger](https://project-n8zne.vercel.app/docs/) · [Health](https://project-n8zne.vercel.app/health). Atlas connectivity, Swagger assets, all four demo-role logins, jurisdiction enforcement, 134,400 readings, pagination, filters, conditional requests, summaries and CORS passed live checks. See `report/archive/LIVE-DEPLOYMENT-VERIFICATION.json`. The production domain retains the initial generated project name. A new protected Preview passed all 14 smoke groups through authenticated CLI requests on 2026-10-04 (Asia/Colombo). Only then was a new Production deployment created; all 14 public production smoke groups passed. See report/archive/RELEASE-VERIFICATION.json, report/archive/NEW-PREVIEW-SMOKE.json and report/archive/NEW-PRODUCTION-SMOKE.json. Environment values were not recorded.
 
 ## Example API Requests
 
@@ -363,7 +375,7 @@ Complete `report/AI-DISCLOSURE-TEMPLATE.md` in your own words. Keep genuine deve
 
 Be prepared to demonstrate login; national vs district visibility; a device POST with 201/Location; forbidden foreign ingestion; paginated/time-filtered history; ETag/304 and If-Match/412; summary arithmetic; Swagger authorization; and MongoDB export/import. Explain why readings are immutable and separate from installations, how queries enforce jurisdiction, what indexes do, and how the serverless connection cache works.
 
-See `COURSEWORK-AUDIT.md` and `report/FINAL-REPORT.md` for the requirement mapping, verified evidence and remaining deployment blockers.
+See `COURSEWORK-AUDIT.md`, `report/FINAL-REPORT.md`, and `report/FIVE-ISSUES-REMEDIATION.md` for the requirement mapping, verified evidence, and remaining assessment gaps.
 
 
 ## Repeatable verification and deployment gate
@@ -378,19 +390,19 @@ npm run seed:verify
 npm test
 npm run lint
 npm run docs:validate
-npm run smoke -- --local report/LOCAL-ATLAS-VERIFICATION.json
+npm run smoke -- --local
 ```
 
 Seeding clears only the six coursework collections in the configured database. Use only the dedicated disposable coursework database. The verifier checks every collection count and 672 readings per installation. The seed no longer prints demo passwords. Do not paste raw credentials, CLI debug output, environment exports or database dumps into evidence.
 
-The smoke runner starts a temporary localhost API with `--local`, or accepts the authorized coursework HTTPS deployment URL. It reads fictional seed credentials in memory, keeps tokens in memory, emits only check results, and preserves the dataset. It covers all four roles, hierarchy routes, own-device reads, forbidden writes, duplicate rejection, validation, conditional requests, summaries and exact reading count. Successful creation is exercised by the isolated automated suite; this smoke runner intentionally uses only rejected write attempts against Atlas.
+The smoke runner starts a temporary localhost API with `--local`, or accepts the authorized coursework HTTPS deployment URL. It reads fictional seed credentials in memory, keeps tokens in memory, emits only check results, and preserves the dataset. Pass a new output filename under `report/evidence/` as an optional second argument to save a fresh JSON run; leave the original verification files intact. It covers all four roles, hierarchy routes, own-device reads, forbidden writes, duplicate rejection, validation, conditional requests, summaries and exact reading count. Successful creation is exercised by the isolated automated suite; this smoke runner intentionally uses only rejected write attempts against Atlas.
 
 Authenticate the Vercel CLI in this shell with `npx vercel login`, then link the existing `slsea-solar-generation-api` project in the `thisajams-projects` team. Verify required variable names and target scopes without printing values. Deploy Preview first, test its protected API through authenticated tooling, and deploy production only after Preview passes. Do not turn off Vercel protection to make tests pass. `.vercel` and environment files are ignored and must stay untracked.
 
 Public production recheck command:
 
 ```sh
-npm run smoke -- https://project-n8zne.vercel.app report/PRODUCTION-RECHECK.json
+npm run smoke -- https://project-n8zne.vercel.app
 ```
 
-The 2026-10-04 release follow-up deployed a new Preview and passed all 14 smoke groups using authenticated Vercel CLI requests, then deployed Production and passed the same 14 groups at the public URL. An explicit `.vercelignore` was added after a dry run detected `.env` in the proposed upload; a second dry run confirmed private files were excluded before any upload. See `report/COMPLETION-STATUS.md` for the final verification scope and remaining submission requirements.
+The 2026-10-04 release follow-up deployed a new Preview and passed all 14 smoke groups using authenticated Vercel CLI requests, then deployed Production and passed the same 14 groups at the public URL. An explicit `.vercelignore` was added after a dry run detected `.env` in the proposed upload; a second dry run confirmed private files were excluded before any upload. See `report/archive/COMPLETION-STATUS.md` for the final verification scope and remaining submission requirements.

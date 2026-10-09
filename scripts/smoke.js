@@ -84,6 +84,38 @@ async function login(email, password) {
     const cors = await call('/api/v1/provinces',null,{method:'OPTIONS',headers:{Origin:'https://assessment.example.test','Access-Control-Request-Method':'GET','Access-Control-Request-Headers':'authorization'}});
     assert.equal(cors.status,204); assert.equal(cors.headers.get('access-control-allow-origin'),'*'); assert.equal(cors.headers.get('access-control-allow-credentials'),null);
   });
+  await check('Freshness and conservative energy quality are explicit', async () => {
+    const latest = await call(`/api/v1/installations/${own.id}/last-reading`, device);
+    assert.equal(latest.status, 200); assert.ok(latest.body.freshness);
+    const f = latest.body.freshness; assert.equal(f.isStale, f.status !== 'fresh');
+    if (f.readingAgeSeconds > f.freshnessThresholdSeconds) assert.equal(f.status, 'stale');
+    assert.equal(latest.headers.get('last-modified'), null);
+    const composite = await call(`/api/v1/installations/${own.id}/composite`, device);
+    assert.ok(composite.body.data.latestReadingFreshness);
+    const r = await call(`/api/v1/districts/${colombo.id}/generation-summary`, district);
+    const q = r.body.data.summary;
+    assert.equal(q.powerQuality.freshInstallations + q.powerQuality.staleInstallations + q.powerQuality.missingInstallations, q.installationCount);
+    if (!q.powerQuality.freshInstallations) assert.equal(q.currentPowerKw, 0);
+    assert.ok(['partial', 'complete-through-last-reading'].includes(q.energyQuality.status));
+    assert.ok(q.todayEnergyKwh >= 0); assert.equal(q.window.timeZone, 'Asia/Colombo');
+  });
+  await check('Signed cursor navigation and query binding', async () => {
+    const path = `/api/v1/installations/${own.id}/readings?pagination=cursor&limit=2&sort=timestamp`;
+    const first = await call(path, device); assert.equal(first.status, 200); assert.equal(first.body.meta.consistency, 'live-keyset');
+    const second = await call(first.body.links.next, device); assert.equal(second.status, 200);
+    assert.equal(new Set([...first.body.data, ...second.body.data].map(r => r.id)).size, 4);
+    const previous = await call(second.body.links.previous, device); assert.deepEqual(previous.body.data.map(r => r.id), first.body.data.map(r => r.id));
+    assert.equal((await call(first.body.links.next + '&from=2000-01-01T00:00:00Z', device)).status, 400);
+    assert.equal((await call(path + '&cursor=invalid', device)).status, 400);
+    assert.equal((await call(first.body.links.next, national)).status, 400);
+  });
+  await check('Forged JWT and cross-device reads are rejected', async () => {
+    const parts = device.split('.'); const claims = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
+    claims.role = 'national-analyst'; parts[1] = Buffer.from(JSON.stringify(claims)).toString('base64url');
+    assert.equal((await call('/api/v1/provinces', parts.join('.'))).status, 401);
+    const other = collections.installations.data.find(i => i.id !== own.id);
+    assert.equal((await call(`/api/v1/installations/${other.id}/readings`, device)).status, 403);
+  });
   await check('Hierarchy atomic and nested resources are reachable', async () => {
     const provinceId=collections.provinces.data[0].id;
     const substationId=own.substation;
