@@ -441,3 +441,22 @@ Request `/api/v1/readings?pagination=snapshot&limit=50&sort=timestamp` (or the e
 Snapshots expire after 15 minutes, contain at most 150000 readings and allow one active session per account. Starting another replaces the prior session. Cursors bind filters, order, limit, principal and jurisdiction; authorization is repeated per page. Invalid cursors return 400, replaced/expired manifests 410, missing members 409, oversized results 422. Direct privileged database modifications are outside the immutable API contract. This is not a long-lived database snapshot transaction.
 
 Run approved `npm run indexes` maintenance before enabling snapshot mode on a target environment; missing TTL setup returns 503. It creates an ephemeral operational cache and additive reading index, with no historical rewrite. Ingestion and snapshot capture require replica-set transaction support. No Atlas maintenance was performed during this finalization.
+
+
+### Seed verification after administrator provisioning
+
+`npm run seed:verify` is read-only against MongoDB. It still requires exactly 9 provinces, 25 districts, 27 substations, 200 installations, 134400 readings and 672 readings per installation. It now requires all **227 original seed identities**, checking each expected email, role, grants and jurisdiction reference, rather than requiring the entire users collection to contain exactly 227 documents. The seed's `admin@example.test` is a national analyst, not an installation administrator.
+
+Every additional account must be an installation-admin with the exact management/read grants, a valid national/province/district jurisdiction, no conflicting references, a nonempty name, a Boolean active flag and a bcrypt cost-12 hash consistent with `admin:create`. Extra analysts/devices, missing or reassigned seed identities, duplicate identities and malformed administrators fail verification. Password hashes are read only for format checking and never included in output. The report separates expectedSeededAccounts, seededAccounts, additionalAccounts, additionalAdministratorAccounts and totalAccounts; counts.users remains the actual total.
+
+Neither the schema nor the provisioning script stores an immutable origin marker. These checks establish conformity with the seed definitions and administrator provisioning contract; they cannot prove which script created an account or that an otherwise valid administrator was authorized. For provenance-sensitive auditing, compare additional account IDs against a separately approved provisioning record/allowlist. No existing records are tagged or changed. Changes to the seed identity definitions or provisioning contract require a corresponding verifier update.
+
+Verification commands:
+
+```sh
+node --check scripts/verify-seed.js
+node --check scripts/lib/verify-seed-users.js
+npm test -- --runTestsByPath tests/seedVerification.test.js
+npm run lint
+npm run seed:verify
+```

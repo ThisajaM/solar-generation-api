@@ -1,6 +1,7 @@
 const fs = require('fs');
 const assert = require('assert/strict');
 let base = process.argv[2];
+const vercelBypass = process.env.VERCEL_AUTOMATION_BYPASS;
 let server;
 let currentCheck = 'startup';
 const results = [];
@@ -8,11 +9,35 @@ const seed = fs.readFileSync('scripts/seed.js', 'utf8');
 // Read only the explicitly fictional seed-account passwords in memory; never print them.
 const passwords = [...seed.matchAll(/passwordHash\('([^']+)'\)/g)].map(match => match[1]);
 async function call(path, token, options = {}) {
-  const response = await fetch(base + path, { ...options, headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...options.headers }, signal: AbortSignal.timeout(30000) });
+  const response = await fetch(base + path, {
+    ...options,
+    headers: {
+      ...(vercelBypass
+        ? { 'x-vercel-protection-bypass': vercelBypass }
+        : {}),
+      ...(token
+        ? { Authorization: `Bearer ${token}` }
+        : {}),
+      ...options.headers
+    },
+    signal: AbortSignal.timeout(30000)
+  });
+
   const text = await response.text();
   let body;
-  try { body = JSON.parse(text); } catch { body = null; }
-  return { status: response.status, headers: response.headers, body, text };
+
+  try {
+    body = JSON.parse(text);
+  } catch {
+    body = null;
+  }
+
+  return {
+    status: response.status,
+    headers: response.headers,
+    body,
+    text
+  };
 }
 async function check(name, fn) {
   currentCheck = name;

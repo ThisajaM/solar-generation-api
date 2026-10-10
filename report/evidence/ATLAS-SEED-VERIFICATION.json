@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-10T11:07:53.140Z",
+  "verifiedAt": "2026-10-10T13:55:20.885Z",
   "target": "Configured Atlas coursework database",
   "counts": {
     "provinces": 9,
@@ -7,7 +7,15 @@
     "substations": 27,
     "solarinstallations": 200,
     "generationreadings": 134400,
-    "users": 227
+    "users": 228
+  },
+  "accounts": {
+    "expectedSeededAccounts": 227,
+    "seededAccounts": 227,
+    "additionalAccounts": 1,
+    "additionalAdministratorAccounts": 1,
+    "totalAccounts": 228,
+    "classification": "Seed identity/role/reference match; additional provisioner-compatible administrators. Creation provenance is not stored or proven."
   },
   "installationsWith672Readings": 200,
   "firstReading": "2026-09-26T21:45:00.000Z",
@@ -20,6 +28,10 @@
     {
       "_id": "district-analyst",
       "count": 25
+    },
+    {
+      "_id": "installation-admin",
+      "count": 1
     },
     {
       "_id": "national-analyst",
