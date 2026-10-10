@@ -24,7 +24,7 @@ app.use(helmet({
 app.use(cors({
   origin: corsOrigin === '*' ? '*' : corsOrigin.split(',').map(value => value.trim()),
   credentials: false,
-  methods: ['GET', 'HEAD', 'POST', 'OPTIONS'],
+  methods: ['GET', 'HEAD', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   exposedHeaders: ['ETag', 'Last-Modified', 'Location']
 }));
 app.use(rateLimit({
@@ -60,10 +60,13 @@ app.use('/api/v1', (req, res, next) => {
   if (['/districts', '/substations', '/installations'].includes(req.path)) allowed.push('provinceId');
   if (['/substations', '/installations'].includes(req.path)) allowed.push('districtId');
   if (req.path === '/installations') allowed.push('substationId');
+  if (req.path.endsWith('/installations')) allowed.push('status', 'search');
+  if (req.path.endsWith('/generation-summary')) allowed.push('mode', 'date', 'from', 'to');
+  if (req.path === '/generation-summary') allowed.push('provinceId', 'districtId', 'substationId');
   for (const [key, value] of Object.entries(req.query)) {
     if (!allowed.includes(key) || typeof value !== 'string') return sendError(res, 400, 'INVALID_PARAMETER', 'Unknown or repeated query parameter', { field: key });
   }
-  if ((req.query.pagination !== undefined && !['offset', 'cursor'].includes(req.query.pagination)) || (req.query.cursor !== undefined && (req.query.pagination !== 'cursor' || !req.query.cursor))) return sendError(res, 400, 'INVALID_PARAMETER', 'Invalid pagination mode or cursor combination', null);
+  if ((req.query.pagination !== undefined && !['offset', 'cursor', 'snapshot'].includes(req.query.pagination)) || (req.query.cursor !== undefined && (!['cursor', 'snapshot'].includes(req.query.pagination) || !req.query.cursor))) return sendError(res, 400, 'INVALID_PARAMETER', 'Invalid pagination mode or cursor combination', null);
   next();
 });
 

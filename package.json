@@ -13,7 +13,9 @@
     "indexes": "node scripts/create-indexes.js",
     "docs:validate": "node scripts/validate-openapi.js",
     "seed:verify": "node scripts/verify-seed.js",
-    "smoke": "node scripts/smoke.js"
+    "smoke": "node scripts/smoke.js",
+    "demo": "node scripts/demo.js",
+    "admin:create": "node scripts/provision-admin.js"
   },
   "engines": {
     "node": "22.x"

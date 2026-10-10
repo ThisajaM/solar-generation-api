@@ -64,7 +64,7 @@ async function getSubstation(req, res) {
 async function listInstallations(req, res) {
   const substation = await geographyService.getSubstation(req.params.substationId);
   if (!substation) return sendError(res, 404, 'NOT_FOUND', 'Substation not found', null);
-  const items = await geographyService.listInstallations(req.user, substation._id);
+  const items = await geographyService.listInstallations(req.user, substation._id, req.query);
   return sendResource(req, res, paginateItems(req, items), collectionStamp(items, substation.updatedAt));
 }
 

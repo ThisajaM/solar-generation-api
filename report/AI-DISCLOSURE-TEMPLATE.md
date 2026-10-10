@@ -78,3 +78,8 @@ I can explain the code I am submitting and I take responsibility for it.
 
 - 2026-10-09: five-issues engineering audit and remediation, isolated tests, protected Preview and public Production verification, Atlas preservation and secret checks. See `FIVE-ISSUES-REMEDIATION.md` and `TEST-RESULTS.md`; retain the exact prompt and distinguish AI-run checks from your own.
 - 2026-10-10: AI-assisted report audit and file reorganization. Preserve this request and disclose any use of its summaries in the submitted materials.
+
+
+## Finalization assistance — 2026-10-10
+
+Codex audited and implemented installation CRUD/admin provisioning, transactional archival enforcement, historical reporting, energy coverage metadata, bounded snapshot manifests, isolated demo tooling, OpenAPI and tests. Codex ran the 171-test suite, lint, OpenAPI validation, 17 isolated smoke groups, five demo groups and read-only Atlas preservation checks. These are automated AI-performed checks, not claims of student-performed work. Codex prepared engineering reports and a genuine commit; no push or deployment was authorized for this pass. Record the actual model shown in the app and retain the user's task prompts. The student must independently explain the implementation and write assessed report prose.

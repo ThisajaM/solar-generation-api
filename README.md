@@ -206,7 +206,7 @@ Version prefix: `/api/v1`.
 | POST | `/api/v1/installations/:installationId/readings` | owning device |
 | GET | `/api/v1/installations/:installationId/readings/:readingId` | analyst or owning device |
 
-Readings are strictly append-only through the API. PUT, PATCH and DELETE are not implemented. GET is safe/idempotent; POST creates immutable history and returns 201 + Location. Duplicate installation/timestamp returns 409. The official brief also asks for CRUD semantics and the rubric explicitly asks for full CRUD. This is unresolved assessment scope, not a confirmed exemption; see `report/OFFICIAL-ASSESSMENT-AUDIT.md`. GET supports If-Match with 412 on failure. CORS preflight returns 204.
+Readings are strictly append-only through the API. PUT, PATCH and DELETE are not implemented. GET is safe/idempotent; POST creates immutable history and returns 201 + Location. Duplicate installation/timestamp returns 409. Full CRUD is implemented on SolarInstallation through a separate scoped administrator role; historical readings remain immutable. See the current release notes below and `report/OFFICIAL-ASSESSMENT-AUDIT.md`. GET supports If-Match with 412 on failure. CORS preflight returns 204.
 
 ## Pagination
 
@@ -280,7 +280,7 @@ Both historical collection routes accept `pagination=cursor&limit=50&sort=timest
 
 JWT validation restricts HS256 and requires subject, expiry, issued-at, role, scope and scopes; claims must match the active database user and device installation/analyst jurisdiction. Existing login-issued tokens remain compatible. No credential or secret was rotated. For credential rotation, disable the affected account first (immediately rejects its tokens), replace its bcrypt hash through a controlled administrative maintenance process, and wait until outstanding tokens expire before re-enabling. Merely changing a password does not revoke existing JWTs. Issuer/audience separation and shared rate-limit storage remain production-hardening work; the current app issues and accepts its own tokens with an exclusive signing secret. The process-local limiter cannot provide a global multi-instance Vercel limit.
 
-The brief permits device append-only writes and analyst reads but the rubric requests full CRUD. No unauthorized administrative role or mutable-history route has been added. Lecturer clarification is required before introducing installation management. See `report/FIVE-ISSUES-REMEDIATION.md`.
+Installation management now uses a separate installation-admin role with explicit jurisdiction and installation-manage scope. Existing analyst accounts retain read-only permissions. This engineering extension satisfies the technical CRUD path without adding mutable history. See `report/FIVE-ISSUES-REMEDIATION.md`.
 
 ## Swagger
 
@@ -309,7 +309,7 @@ CLI alternative: `npx vercel login`, `npx vercel link`, configure the same envir
 
 The configuration follows [Vercel Node functions](https://vercel.com/docs/functions/runtimes/node-js) and [function file inclusion](https://vercel.com/docs/project-configuration/vercel-json). No persistent filesystem, background process or production `app.listen()` is required. MongoDB connections and in-flight connection promises are reused within each warm process.
 
-**Five-issues Production deployment verified (2026-10-09).** The Preview and authorized Production deployment each passed 17 smoke groups after 120 automated tests, lint and OpenAPI validation. All six Atlas collection counts and data digests remained unchanged. The current public API and Swagger are at [project-n8zne.vercel.app](https://project-n8zne.vercel.app/docs/); deployment `dpl_2wQEX9c6VHZxApMCiR5kdv5RtxVe`. Full CRUD remains unresolved pending lecturer clarification. See [remediation evidence](report/FIVE-ISSUES-REMEDIATION.md) and [consolidated test results](report/TEST-RESULTS.md).
+**Five-issues Production deployment verified (2026-10-09).** The Preview and authorized Production deployment each passed 17 smoke groups after 120 automated tests, lint and OpenAPI validation. All six Atlas collection counts and data digests remained unchanged. The current public API and Swagger are at [project-n8zne.vercel.app](https://project-n8zne.vercel.app/docs/); deployment `dpl_2wQEX9c6VHZxApMCiR5kdv5RtxVe`. At that earlier release, full CRUD was unresolved; the unreleased local implementation now adds it. See [remediation evidence](report/FIVE-ISSUES-REMEDIATION.md) and [consolidated test results](report/TEST-RESULTS.md).
 
 **Production deployment verified (2026-10-03).** [Live Swagger](https://project-n8zne.vercel.app/docs/) · [Health](https://project-n8zne.vercel.app/health). Atlas connectivity, Swagger assets, all four demo-role logins, jurisdiction enforcement, 134,400 readings, pagination, filters, conditional requests, summaries and CORS passed live checks. See `report/archive/LIVE-DEPLOYMENT-VERIFICATION.json`. The production domain retains the initial generated project name. A new protected Preview passed all 14 smoke groups through authenticated CLI requests on 2026-10-04 (Asia/Colombo). Only then was a new Production deployment created; all 14 public production smoke groups passed. See report/archive/RELEASE-VERIFICATION.json, report/archive/NEW-PREVIEW-SMOKE.json and report/archive/NEW-PRODUCTION-SMOKE.json. Environment values were not recorded.
 
@@ -380,7 +380,7 @@ See `COURSEWORK-AUDIT.md`, `report/FINAL-REPORT.md`, and `report/FIVE-ISSUES-REM
 
 ## Repeatable verification and deployment gate
 
-The official assessment comparison is in `report/OFFICIAL-ASSESSMENT-AUDIT.md`. Full CRUD is unresolved: readings remain append-only and the assessment does not identify a compatible mutable resource/actor. Do not claim update/delete coverage until that scope is clarified.
+The official assessment comparison is in `report/OFFICIAL-ASSESSMENT-AUDIT.md`. Installation create/read/PATCH/archive is now tested locally. The separately authorized administrator is a documented engineering interpretation; historical readings remain append-only. New live deployment and personal submission requirements remain pending.
 
 With private local configuration in place, run:
 
@@ -406,3 +406,38 @@ npm run smoke -- https://project-n8zne.vercel.app
 ```
 
 The 2026-10-04 release follow-up deployed a new Preview and passed all 14 smoke groups using authenticated Vercel CLI requests, then deployed Production and passed the same 14 groups at the public URL. An explicit `.vercelignore` was added after a dry run detected `.env` in the proposed upload; a second dry run confirmed private files were excluded before any upload. See `report/archive/COMPLETION-STATUS.md` for the final verification scope and remaining submission requirements.
+
+
+## Unreleased finalization — 2026-10-10
+
+This local source passed 171 tests, lint and OpenAPI validation, 17 isolated smoke groups and five isolated demo groups. It has **not** been pushed or deployed. The existing public site serves the previous release. See [engineering evidence](report/FIVE-ISSUES-REMEDIATION.md) and [release checklist](report/DEPLOYMENT-CHECKLIST.md).
+
+### Installation CRUD in Swagger
+
+1. For a safe demonstration, set a private `DEMO_ADMIN_PASSWORD` of 16–72 UTF-8 bytes (at least 16 characters) without putting its value in command history, then run `npm run demo`. The demo uses a disposable local MongoDB replica set, never Atlas, and seeded synthetic history. Open the printed localhost Swagger URL (default port 3001). Stop the process to remove the disposable database.
+2. Use POST `/api/v1/auth/login` with `installation-admin@example.test` and your privately supplied password. Copy only the returned token into Swagger Authorize; do not share or log it.
+3. GET `/api/v1/substations` and choose an actual returned substation ID. POST `/api/v1/installations` using a unique code and meterId, name, positive capacityKw, valid latitude/longitude and that substation reference. Follow the returned Location; expect 201 then GET 200.
+4. GET `/api/v1/installations` supports provinceId, districtId, substationId, status, search and existing pagination. PATCH the new installation's name or capacityKw; expect 200. Identifier and substation changes are rejected. Read-only users and devices cannot manage installations.
+5. DELETE that disposable installation; expect 204. Repeat DELETE; expect 204. Default lists exclude it; `status=archived` reveals it to authorized readers. Historical retrieval remains available. New reading ingestion into archived installations returns 409. Never use seeded production installations for destructive demonstrations.
+
+Production administrators are not automatically provisioned. `npm run admin:create` is a guarded, create-only maintenance operation described in the release checklist; no existing user is elevated. Management can be national, province or district scoped.
+
+### Live and historical reports
+
+- Live: `/api/v1/generation-summary?mode=live` preserves actual timestamps and excludes stale power.
+- Historical Colombo day: `/api/v1/generation-summary?mode=historical&date=2026-10-02`.
+- Historical explicit range: `/api/v1/generation-summary?mode=historical&from=2026-10-01T18%3A30%3A00Z&to=2026-10-02T18%3A30%3A00Z`.
+- Installation: `/api/v1/installations/{installationId}/generation-summary?mode=historical&date=2026-10-02`.
+- Existing district summary accepts the same historical parameters. Global reports support geographical filters within the authenticated jurisdiction.
+
+Actual Atlas measurements span 2026-09-26T21:45Z through 2026-10-03T21:30Z. Historical reports bypass live freshness filtering without rewriting timestamps. Windows are limited to 31 days and 150000 input readings. Query smaller windows if 422 is returned.
+
+Read energyKwh together with coveragePercent, expectedReadings, actualReadings, missingIntervals, hasMeterReset, isComplete and qualityStatus. Only observed valid counter intervals count. Missing/reset intervals are excluded; no estimates are invented. Completeness requires full duration coverage without quality warnings. Unavailable may retain numeric zero for compatibility; it is not proof of zero generation. Coverage uses selected catalog installations, without an inferred commissioning history.
+
+### Fixed-membership history pagination
+
+Request `/api/v1/readings?pagination=snapshot&limit=50&sort=timestamp` (or the existing installation readings route). Follow links.next unchanged. The first request captures ordered IDs in a short snapshot-read transaction; later requests use that fixed manifest, excluding later inserts even if backdated. Total is fixed. Existing offset and live-keyset modes remain available.
+
+Snapshots expire after 15 minutes, contain at most 150000 readings and allow one active session per account. Starting another replaces the prior session. Cursors bind filters, order, limit, principal and jurisdiction; authorization is repeated per page. Invalid cursors return 400, replaced/expired manifests 410, missing members 409, oversized results 422. Direct privileged database modifications are outside the immutable API contract. This is not a long-lived database snapshot transaction.
+
+Run approved `npm run indexes` maintenance before enabling snapshot mode on a target environment; missing TTL setup returns 503. It creates an ephemeral operational cache and additive reading index, with no historical rewrite. Ingestion and snapshot capture require replica-set transaction support. No Atlas maintenance was performed during this finalization.

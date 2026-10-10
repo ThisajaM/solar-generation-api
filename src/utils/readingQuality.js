@@ -24,7 +24,7 @@ function dailyEnergy(readings, start, now, interval = reportingIntervalSeconds) 
     countersByTime.set(time, row.cumulativeEnergyKwh);
   }
   if (ambiguousTimes.size) reasons.add('conflicting-duplicate');
-  let decreases = 0; let gaps = 0; let acceptedIntervals = 0;
+  let decreases = 0; let gaps = 0; let acceptedIntervals = 0; let coveredMilliseconds = 0;
   if (!rows.length || +new Date(rows[0].timestamp) !== +start) reasons.add('missing-midnight-baseline');
   for (let i = 1; i < rows.length; i++) {
     const previous = rows[i - 1]; const current = rows[i];
@@ -35,12 +35,13 @@ function dailyEnergy(readings, start, now, interval = reportingIntervalSeconds) 
     if (![previous.cumulativeEnergyKwh, current.cumulativeEnergyKwh].every(v => Number.isFinite(v) && v >= 0)) { reasons.add('invalid-counter'); continue; }
     if (delta < 0) { decreases++; reasons.add('counter-decrease'); continue; }
     if (elapsed > interval) { gaps++; reasons.add('missing-intervals'); continue; }
-    energy += delta; acceptedIntervals++;
+    energy += delta; acceptedIntervals++; coveredMilliseconds += elapsed * 1000;
   }
   const last = rows.at(-1);
   if (!last || (+now - +new Date(last.timestamp)) / 1000 > interval) reasons.add('missing-recent-reading');
   return { energyKwh: energy, quality: { status: reasons.size ? 'partial' : 'complete-through-last-reading',
     reasons: [...reasons].sort(), counterDecreases: decreases, gapIntervals: gaps, acceptedIntervals,
+    coveredMilliseconds, actualReadings: countersByTime.size,
     observedThrough: last ? new Date(last.timestamp).toISOString() : null } };
 }
 module.exports = { freshness, dailyEnergy };

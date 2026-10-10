@@ -7,7 +7,7 @@ const schema = new mongoose.Schema({
   passwordHash: { type: String, required: true },
   role: {
     type: String,
-    enum: ['national-analyst', 'province-analyst', 'district-analyst', 'device'],
+    enum: ['national-analyst', 'province-analyst', 'district-analyst', 'device', 'installation-admin'],
     required: true
   },
   scope: { type: String, enum: ['national', 'province', 'district', 'installation'], required: true },
@@ -21,6 +21,9 @@ const schema = new mongoose.Schema({
 
 schema.pre('validate', function validateScope(next) {
   const mapping = { 'national-analyst': ['national', null, 'analyst-read'], 'province-analyst': ['province', 'province', 'analyst-read'], 'district-analyst': ['district', 'district', 'analyst-read'], device: ['installation', 'installation', 'installation-write'] };
+  if (this.role === 'installation-admin') {
+    if (!['national', 'province', 'district'].includes(this.scope) || (this.scope !== 'national' && !this[this.scope]) || JSON.stringify(this.scopes) !== JSON.stringify(['analyst-read', 'installation-manage'])) this.invalidate('scope', 'Administrator jurisdiction and scopes must agree');
+  }
   const rule = mapping[this.role];
   if (rule && (this.scope !== rule[0] || (rule[1] && !this[rule[1]]) || this.scopes.length !== 1 || this.scopes[0] !== rule[2])) {
     this.invalidate('scope', 'Role, jurisdiction and granted scopes must agree');

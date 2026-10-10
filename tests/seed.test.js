@@ -1,4 +1,4 @@
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const { MongoMemoryReplSet } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
 const { execFile, spawn } = require('child_process');
 const { promisify } = require('util');
@@ -14,7 +14,7 @@ let uri;
 const root = path.resolve(__dirname, '..');
 
 beforeAll(async () => {
-  mongod = await MongoMemoryServer.create();
+  mongod = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
   uri = mongod.getUri('slsea_seed_test');
   connection = await mongoose.createConnection(uri).asPromise();
   out = await fs.mkdtemp(path.join(os.tmpdir(), 'slsea-export-'));
@@ -104,5 +104,25 @@ test('full seed, referential integrity, realistic intervals, BSON export/import 
   const second = await (await fetch(base + first.links.next, { headers: { Authorization: `Bearer ${token}` } })).json();
   expect(new Set([...first.data, ...second.data].map(r => r.id)).size).toBe(200);
   expect(second.meta.consistency).toBe('live-keyset');
+  // Prepare production database indexes in the isolated seed database, idempotently.
+  await run('npm', ['run', 'indexes'], { cwd: root, env: env() });
+  await run('npm', ['run', 'indexes'], { cwd: root, env: env() });
+  const fixed = await (await fetch(`${base}/api/v1/readings?pagination=snapshot&limit=100&sort=timestamp`, { headers: { Authorization: `Bearer ${token}` } })).json();
+  expect(fixed.error).toBeUndefined();
+  expect(fixed.meta.total).toBe(134400); expect(fixed.meta.consistency).toBe('fixed-membership');
+  const fixedNext = await (await fetch(base + fixed.links.next, { headers: { Authorization: `Bearer ${token}` } })).json();
+  expect(new Set([...fixed.data, ...fixedNext.data].map(r => r.id)).size).toBe(200);
+  const plan = await db.collection('generationreadings').find({}).sort({ timestamp: 1, _id: 1 }).limit(100).hint('snapshot_time_id').explain('executionStats');
+  expect(plan.executionStats.totalDocsExamined).toBeLessThanOrEqual(100);
+  const smokePath = path.join(out, 'smoke.json');
+  await run(process.execPath, [path.join(root, 'scripts/smoke.js'), '--local', smokePath], { cwd: root, env: { ...env(), NODE_ENV: 'test', MONGODB_URI: '', MONGODB_TEST_URI: uri }, maxBuffer: 1024 * 1024 });
+  const smoke = JSON.parse(await fs.readFile(smokePath, 'utf8')); expect(smoke.results).toHaveLength(17); expect(smoke.results.every(r => r.passed)).toBe(true);
+  await fs.writeFile(path.join(root, 'report/evidence/FINALIZATION-ISOLATED-SMOKE.json'), JSON.stringify(smoke, null, 2) + '\n');
+  const extra = Array.from({ length: 15601 }, (_, n) => ({ installation: regeneratedInstallation._id, timestamp: new Date(Date.UTC(2030, 0, 1) + n * 1000), powerKw: 1, cumulativeEnergyKwh: n, voltage: 230 }));
+  await db.collection('generationreadings').insertMany(extra);
+  const tooLarge = await fetch(`${base}/api/v1/readings?pagination=snapshot`, { headers: { Authorization: `Bearer ${token}` } });
+  expect(tooLarge.status).toBe(422);
+  const priorSnapshot = await (await fetch(base + fixed.links.next, { headers: { Authorization: `Bearer ${token}` } })).json();
+  expect(priorSnapshot.meta.total).toBe(134400);
   expect((await fetch(`${base}/docs/swagger-ui-bundle.js`)).status).toBe(200);
 }, 180000);

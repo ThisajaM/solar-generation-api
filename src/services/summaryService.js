@@ -1,3 +1,4 @@
+const { energyCoverage } = require('../utils/energyCoverage');
 const { freshness, dailyEnergy } = require('../utils/readingQuality');
 const District = require('../models/District');
 const Substation = require('../models/Substation');
@@ -11,7 +12,7 @@ async function districtSummary(districtId, now = new Date()) {
 
   const substations = await Substation.find({ district: district._id }).select('_id');
   const substationIds = substations.map(s => s._id);
-  const installations = await SolarInstallation.find({ substation: { $in: substationIds } }).select('_id');
+  const installations = await SolarInstallation.find({ substation: { $in: substationIds }, status: { $ne: 'archived' } }).select('_id');
   const installationIds = installations.map(i => i._id);
   const start = startOfColomboDay(now);
 
@@ -33,6 +34,7 @@ async function districtSummary(districtId, now = new Date()) {
   const powerQuality = { freshInstallations: 0, staleInstallations: 0, missingInstallations: 0 };
   const energyQuality = { status: 'complete-through-last-reading', partialInstallations: 0, counterDecreases: 0, gapIntervals: 0, reasons: [] };
   const reasons = new Set();
+  const coverage = [];
   for (const row of rows) {
     const last = row.latest[0];
     const state = freshness(last, now);
@@ -43,6 +45,7 @@ async function districtSummary(districtId, now = new Date()) {
       lastKnownPowerKw += last.powerKw;
       if (!latestReadingAt || last.timestamp > latestReadingAt) latestReadingAt = last.timestamp;
     }
+    coverage.push(energyCoverage(row.today, start, now));
     const energy = dailyEnergy(row.today, start, now);
     todayEnergyKwh += energy.energyKwh;
     if (energy.quality.status === 'partial') energyQuality.partialInstallations++;
@@ -52,6 +55,13 @@ async function districtSummary(districtId, now = new Date()) {
   }
   if (energyQuality.partialInstallations) energyQuality.status = 'partial';
   energyQuality.reasons = [...reasons].sort();
+  const sum = key => coverage.reduce((n, q) => n + q[key], 0);
+  Object.assign(energyQuality, { coveragePercent: coverage.length ? Math.floor(sum('coveragePercent') / coverage.length * 100) / 100 : 0,
+    expectedReadings: sum('expectedReadings'), actualReadings: sum('actualReadings'), missingIntervals: sum('missingIntervals'),
+    hasMeterReset: coverage.some(q => q.hasMeterReset), hasCounterDecrease: coverage.some(q => q.hasCounterDecrease),
+    isComplete: coverage.length > 0 && coverage.every(q => q.isComplete),
+    qualityStatus: coverage.length && coverage.every(q => q.isComplete) ? 'complete' : coverage.some(q => q.qualityStatus !== 'unavailable') ? 'partial' : 'unavailable',
+    measurementType: 'measured', estimatedEnergyKwh: null, assessedThrough: now.toISOString() });
 
   return {
     district: {

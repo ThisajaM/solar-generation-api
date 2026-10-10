@@ -1,0 +1,14 @@
+{
+  "verifiedAt": "2026-10-10T08:56:39.665Z",
+  "allSixCountsAndDigestsUnchanged": true,
+  "readingIndexesUnchanged": true,
+  "counts": {
+    "provinces": 9,
+    "districts": 25,
+    "substations": 27,
+    "solarinstallations": 200,
+    "generationreadings": 134400,
+    "users": 227
+  },
+  "productionMutationsPerformed": false
+}

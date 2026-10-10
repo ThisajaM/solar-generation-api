@@ -8,6 +8,7 @@ function errorHandler(err, req, res, _next) {
   if (process.env.NODE_ENV !== 'test') {
     if (!err.status || err.status >= 500) console.error('Request failed:', err.name);
   }
+  if (err.code === 50 || err.name === 'MongoOperationTimeoutError') return sendError(res, 503, 'QUERY_TIMEOUT', 'Database operation exceeded its time budget; narrow the query or retry', null);
   if (err.type === 'entity.too.large') return sendError(res, 413, 'PAYLOAD_TOO_LARGE', 'JSON body exceeds 100kb', null);
   if (err.status && err.code) {
     return sendError(res, err.status, err.code, err.message, err.detail || null);

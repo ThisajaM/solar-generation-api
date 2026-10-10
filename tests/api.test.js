@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const request = require('supertest');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const { MongoMemoryReplSet } = require('mongodb-memory-server');
 
 const Province = require('../src/models/Province');
 const District = require('../src/models/District');
@@ -24,7 +24,7 @@ async function login(email, password) {
 }
 
 beforeAll(async () => {
-  mongod = await MongoMemoryServer.create();
+  mongod = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
   process.env.MONGODB_TEST_URI = mongod.getUri('slsea_test');
   app = require('../api/index');
   const { connectDatabase } = require('../src/config/database');
@@ -421,7 +421,7 @@ describe('regressions and security boundaries', () => {
       expect(res.text).toBe('');
       expect(res.headers['access-control-allow-origin']).toBe('*');
       expect(res.headers['access-control-allow-credentials']).toBeUndefined();
-      expect(res.headers['access-control-allow-methods']).toBe('GET,HEAD,POST,OPTIONS');
+      expect(res.headers['access-control-allow-methods']).toBe('GET,HEAD,POST,PATCH,DELETE,OPTIONS');
       expect(res.headers['access-control-allow-headers']).toContain('authorization');
       expect(res.headers['access-control-allow-headers']).toContain('content-type');
     }

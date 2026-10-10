@@ -1,0 +1,22 @@
+{
+  "verifiedAt": "2026-10-10T03:39:17.247Z",
+  "duplicates": {
+    "solarinstallations.code": 0,
+    "solarinstallations.meterId": 0,
+    "solarinstallations.inverterId": 0,
+    "users.email": 0
+  },
+  "brokenReferences": {
+    "districts.province": 0,
+    "substations.district": 0,
+    "solarinstallations.substation": 0,
+    "generationreadings.installation": 0,
+    "users.installation": 0
+  },
+  "measurementWindow": {
+    "first": "2026-09-26T21:45:00.000Z",
+    "last": "2026-10-03T21:30:00.000Z"
+  },
+  "transactionsSupported": true,
+  "allChecksPass": true
+}

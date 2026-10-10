@@ -10,7 +10,9 @@ const schema = new mongoose.Schema({
   latitude: { type: Number, required: true, min: -90, max: 90 },
   longitude: { type: Number, required: true, min: -180, max: 180 },
   substation: { type: mongoose.Schema.Types.ObjectId, ref: 'Substation', required: true, index: true },
-  status: { type: String, enum: ['active', 'inactive', 'commissioning'], default: 'active' }
+  archivedAt: { type: Date },
+  ingestionVersion: { type: Number, select: false },
+  status: { type: String, enum: ['active', 'inactive', 'commissioning', 'archived'], default: 'active' }
 }, { timestamps: true, versionKey: false });
 
 schema.pre('validate', function requireMeterOrInverter(next) {

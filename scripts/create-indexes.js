@@ -1,10 +1,12 @@
 const { connectDatabase, disconnectDatabase } = require('../src/config/database');
-const models = ['Province', 'District', 'Substation', 'SolarInstallation', 'GenerationReading', 'User'].map(name => require(`../src/models/${name}`));
+const models = ['Province', 'District', 'Substation', 'SolarInstallation', 'GenerationReading', 'User', 'ReadingSnapshot'].map(name => require(`../src/models/${name}`));
 
 async function main() {
   await connectDatabase();
   for (const model of models) {
+    await model.createCollection();
     await model.createIndexes();
+    if (model.modelName === 'GenerationReading') await model.collection.createIndex({ timestamp: 1, _id: 1 }, { name: 'snapshot_time_id' });
     console.log(`Indexes ready: ${model.collection.name}`);
   }
 }

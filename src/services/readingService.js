@@ -58,6 +58,7 @@ async function listReadings(req, installation) {
     if (to) query.timestamp.$lte = to;
   }
 
+  if (req.query.pagination === 'snapshot') return { payload: await require('./snapshotService').snapshotPage(req, GenerationReading, query, limit, sort.startsWith('-') ? -1 : 1) };
   if (req.query.pagination === 'cursor') return { payload: await cursorPage(req, GenerationReading, query, limit, sort.startsWith('-') ? -1 : 1) };
   const sortSpec = { timestamp: sort.startsWith('-') ? -1 : 1 };
   const total = await GenerationReading.countDocuments(query);
@@ -81,17 +82,23 @@ async function listReadings(req, installation) {
 }
 
 async function createReading(installationId, body) {
-  const installation = await SolarInstallation.findById(installationId);
-  if (!installation) return null;
   const input = readingInput(body);
+  const session = await SolarInstallation.startSession();
+  let reading;
   try {
-    return await GenerationReading.create({ installation: installation._id, ...input });
+    await session.withTransaction(async () => {
+      const installation = await SolarInstallation.findOneAndUpdate({ _id: installationId, status: { $ne: 'archived' } }, { $inc: { ingestionVersion: 1 } }, { session, new: true });
+      if (!installation) {
+        if (await SolarInstallation.exists({ _id: installationId }).session(session)) throw HttpError(409, 'INSTALLATION_ARCHIVED', 'Archived installations do not accept readings');
+        reading = null; return;
+      }
+      [reading] = await GenerationReading.create([{ installation: installation._id, ...input }], { session });
+    }, { readConcern: { level: 'snapshot' }, writeConcern: { w: 'majority' }, maxCommitTimeMS: 5000, timeoutMS: 15000 });
+    return reading;
   } catch (error) {
-    if (error.code === 11000) {
-      throw HttpError(409, 'DUPLICATE_RESOURCE', 'A reading already exists for this installation and timestamp', error.keyValue);
-    }
+    if (error.code === 11000) throw HttpError(409, 'DUPLICATE_READING', 'A reading for this installation and timestamp already exists', null);
     throw error;
-  }
+  } finally { await session.endSession(); }
 }
 
 async function getReading(installationId, readingId) {

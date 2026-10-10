@@ -47,8 +47,9 @@ async function getSubstation(substationId) {
   return Substation.findById(substationId).populate('district');
 }
 
-async function listInstallations(user, substationId) {
+async function listInstallations(user, substationId, filters = {}) {
   const query = await filterInstallationsQuery(user, substationId);
+  Object.assign(query, require('./installationService').installationFilters(filters));
   return SolarInstallation.find(query).sort({ name: 1 });
 }
 

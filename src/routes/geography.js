@@ -37,4 +37,19 @@ router.get('/substations/:substationId/installations', authenticate, requireScop
 router.get('/installations/:installationId', authenticate, requireScope('analyst-read', 'installation-write'), authorizeInstallationRead, asyncHandler(controller.getInstallation));
 router.get('/installations/:installationId/composite', authenticate, requireScope('analyst-read', 'installation-write'), authorizeInstallationRead, asyncHandler(controller.getComposite));
 
+const installationService = require('../services/installationService');
+function requireAdministrator(req, res, next) {
+  if (req.user.role !== 'installation-admin') return require('../utils/http').sendError(res, 403, 'INSUFFICIENT_SCOPE', 'Installation administrator role is required', null);
+  return next();
+}
+router.post('/installations', authenticate, requireScope('installation-manage'), requireAdministrator, asyncHandler(async (req, res) => {
+  const data = await installationService.createInstallation(req.user, req.body);
+  res.location(`/api/v1/installations/${data._id}`).status(201).json({ data });
+}));
+router.patch('/installations/:installationId', authenticate, requireScope('installation-manage'), requireAdministrator, authorizeInstallationRead, asyncHandler(async (req, res) => {
+  res.json({ data: await installationService.patchInstallation(req.params.installationId, req.body) });
+}));
+router.delete('/installations/:installationId', authenticate, requireScope('installation-manage'), requireAdministrator, authorizeInstallationRead, asyncHandler(async (req, res) => {
+  await installationService.archiveInstallation(req.params.installationId); res.status(204).end();
+}));
 module.exports = router;

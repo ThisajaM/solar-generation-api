@@ -37,7 +37,9 @@ async function listCollection(req, kind) {
     const direction = parseSort(req.query.sort).startsWith('-') ? -1 : 1;
     sort = { timestamp: direction, _id: direction };
   }
+  if (kind === 'readings' && req.query.pagination === 'snapshot') return require('./snapshotService').snapshotPage(req, model, query, limit, sort.timestamp);
   if (kind === 'readings' && req.query.pagination === 'cursor') return cursorPage(req, model, query, limit, sort.timestamp);
+  if (kind === 'installations') Object.assign(query, require('./installationService').installationFilters(req.query));
   const total = await model.countDocuments(query);
   const data = await model.find(query).sort(sort).skip((page - 1) * limit).limit(limit);
   const pages = Math.ceil(total / limit);
@@ -51,4 +53,4 @@ function paginateItems(req, items) {
   return paginated({ data: items.slice((page - 1) * limit, page * limit), total, page, limit, links: buildPageLinks(req, { page, limit, pages }) });
 }
 
-module.exports = { listCollection, paginateItems };
+module.exports = { listCollection, paginateItems, visibleFilters };

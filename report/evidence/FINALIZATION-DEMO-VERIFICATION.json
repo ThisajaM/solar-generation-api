@@ -1,0 +1,26 @@
+{
+  "verifiedAt": "2026-10-10T03:54:12.667Z",
+  "environment": "Disposable synthetic local replica set; no Atlas access",
+  "checks": [
+    {
+      "check": "Swagger CRUD documentation",
+      "passed": true
+    },
+    {
+      "check": "Private demo administrator login",
+      "passed": true
+    },
+    {
+      "check": "Create, list, retrieve, PATCH, repeated archive",
+      "passed": true
+    },
+    {
+      "check": "Historical seed report with explicit mixed coverage",
+      "passed": true
+    },
+    {
+      "check": "Full-size fixed reading snapshot",
+      "passed": true
+    }
+  ]
+}

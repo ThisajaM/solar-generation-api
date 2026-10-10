@@ -51,4 +51,4 @@ async function cursorPage(req, model, query, limit, direction) {
   return { data, meta: { total, limit, pagination: 'cursor', consistency: 'live-keyset' },
     links: { self: req.originalUrl, previous: before ? link(encode(first, 'previous', bound)) : null, next: after ? link(encode(last, 'next', bound)) : null } };
 }
-module.exports = { cursorPage };
+module.exports = { cursorPage, binding, signature, invalid };
