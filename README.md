@@ -1,5 +1,9 @@
 # Real-Time Solar Generation Data API
 
+- **Module:** NB6007CEM - Web API Development
+- **Student Name:** T.T.Mudalige
+- **Index:** COBSCCOMP251P-029
+
 REST API coursework (NB6007CEM) for the Sri Lanka Sustainable Energy Authority (SLSEA). There is no frontend: the HTTP API is the deliverable.
 
 **Richardson Maturity Model:** this project targets **Level 2** (resources, HTTP methods, and meaningful status codes). Level 3 / HATEOAS is out of scope.
